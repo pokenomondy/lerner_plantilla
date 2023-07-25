@@ -1,0 +1,82 @@
+{
+  "project_info": {
+    "project_number": "1086255448541",
+    "project_id": "materias-app-2ab7f",
+    "storage_bucket": "materias-app-2ab7f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1086255448541:android:2bf3e86ee31c2d7584f634",
+        "android_client_info": {
+          "package_name": "com.LIBA.lerner_plantilla"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1086255448541-8dq83moq1b8jon6f5kr3hp71tiublqcn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAntWWR-RqhwQgKmsJ0FxqJ1ZcwHTefhmo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1086255448541-8dq83moq1b8jon6f5kr3hp71tiublqcn.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1086255448541-nm6spbu6fe04i5c8cu15jlgq20gkuo07.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.materiapp"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1086255448541:android:d45c6612ef7e099484f634",
+        "android_client_info": {
+          "package_name": "com.example.materiapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1086255448541-8dq83moq1b8jon6f5kr3hp71tiublqcn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAntWWR-RqhwQgKmsJ0FxqJ1ZcwHTefhmo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1086255448541-8dq83moq1b8jon6f5kr3hp71tiublqcn.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1086255448541-nm6spbu6fe04i5c8cu15jlgq20gkuo07.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.materiapp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
