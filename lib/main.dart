@@ -11,7 +11,7 @@ void main() async {
   runApp(MyApp());
 }
 
-//Esto esta muy py
+//Esto esta muy
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
