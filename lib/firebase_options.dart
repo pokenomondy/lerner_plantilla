@@ -57,7 +57,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyAntWWR-RqhwQgKmsJ0FxqJ1ZcwHTefhmo',
-    appId: '1:1086255448541:android:2bf3e86ee31c2d7584f634',
+    appId: '1:1086255448541:android:4aa5ff39bf4b96f384f634',
     messagingSenderId: '1086255448541',
     projectId: 'materias-app-2ab7f',
     storageBucket: 'materias-app-2ab7f.appspot.com',
@@ -65,7 +65,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyBsF8YixXP3UnlLeponbijqbNgPsiXriRY',
-    appId: '1:1086255448541:ios:2f1034e06923bee284f634',
+    appId: '1:1086255448541:ios:6e4bab8d3a4f1be784f634',
     messagingSenderId: '1086255448541',
     projectId: 'materias-app-2ab7f',
     storageBucket: 'materias-app-2ab7f.appspot.com',
