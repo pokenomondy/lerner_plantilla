@@ -138,11 +138,6 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
-=======
-      initialRoute: "build-wait-screen",
-      routes: {
-        'build-wait-screen': ( _ ) => waitScreenBuild()
-      },
     );
   }
 }
