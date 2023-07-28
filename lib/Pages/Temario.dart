@@ -23,23 +23,22 @@ class _TemarioState extends State<Temario> {
   List<Temas> temasList = [];
 
 
-
   Future obtenerTemasDesdeFirebase() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String temasJson = prefs.getString('temas_list') ?? '';
     List<dynamic> temasData = jsonDecode(temasJson);
     List temasList = temasData.map((temaData) => Temas.fromJson(temaData)).toList();
+
     return temasList;
   }
 
-
-
-
   @override
   Widget build(BuildContext context) {
+    final currentwidth = MediaQuery.of(context).size.width;
+    final currentheight = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Config.colorPrincipal,
+        backgroundColor: Config.primary_color,
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.search),
@@ -68,57 +67,21 @@ class _TemarioState extends State<Temario> {
                   List<Temas> temaslist = snapshot.data;
 
                   return Container(
-                    height: 600,
+                    height: currentheight-100,
+
                     child: ListView.builder(
+                      shrinkWrap: true,
                       itemCount: temaslist.length,
                       itemBuilder: (context, index) {
                         Temas tema = temaslist[index];
-                        return Column(
-                          children: [
-                            Container(
-                              height: 40,
-                              child: ListTile(
-                                title: Text(
-                                    "${tema.ordentema} . ${tema.nombreTema}"),
-                              ),
-                            ),
-                            ListView.builder(
-                              shrinkWrap: true,
-                              physics: NeverScrollableScrollPhysics(),
-                              itemCount: tema.subtemas.length,
-                              itemBuilder: (context, subIndex) {
-                                SubTemas subtema = tema.subtemas[subIndex];
-                                return Padding(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 16.0),
-                                  child: GestureDetector(
-                                      onTap: () {
-                                        print(subtema.nombreSubTema);
 
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                VistaContenido(
-                                                    contenidos: subtema
-                                                        .contenidos),
-                                          ),
-                                        );
-                                      },
-                                      child: Card(
-                                        child: Column(
-                                          children: [
-                                            Text("${tema.ordentema}.${subtema
-                                                .ordenSubtema}.${subtema
-                                                .nombreSubTema}"),
-                                          ],
-                                        ),
-                                      )
-                                  ),
-                                );
-                              },
-                            ),
-                          ],
+                        return Padding(
+                          padding: const EdgeInsets.all(20.0),
+                          child: Column(
+                            children: [
+                              CuadroTema(tema,temaslist),
+                            ],
+                          ),
                         );
                       },
                     ),
@@ -126,7 +89,7 @@ class _TemarioState extends State<Temario> {
                 }
               }
 
-    ),
+          ),
         ],
       ),
 
@@ -134,6 +97,101 @@ class _TemarioState extends State<Temario> {
   }
 
 
+}
+
+class CuadroTema extends StatefulWidget{
+  final Temas tema;
+  final List<Temas> temasList;
+
+  CuadroTema(this.tema, this.temasList,);
+
+  @override
+  _CuadroTemaState createState() => _CuadroTemaState();
+}
 
 
+class _CuadroTemaState extends State<CuadroTema> {
+  List<bool> _isExpandedList = [];
+
+
+  @override
+  void initState() {
+    super.initState();
+    print(_isExpandedList);
+    /*
+    print("numero retornado ${widget.temasList.length}");
+
+     */
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: cuadoTemaestilo(),
+      child: ExpansionPanelList(
+        elevation: 0,
+        expansionCallback: (i, isExpanded) {
+          setState(() {
+            _isExpandedList[i] = !isExpanded; // Cambiar el estado del panel al hacer clic en el encabezado
+            print(_isExpandedList);
+            print(i);
+          });
+        },
+        children: [
+        ExpansionPanel(
+        hasIcon: false,
+        canTapOnHeader: true,
+        headerBuilder: (context, isOpen) {
+          return Container(
+            height: 100,
+            child: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text("${widget.tema.ordentema} . ${widget.tema.nombreTema}", style: estilotexto(),),
+                      Text('## subtemas'),
+                    ],
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(top: 12),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Texto careverga adciional'),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+        body: Text('asasasa'),
+      ),
+        ],
+      ),
+    );
+  }
+
+  estilotexto(){
+    return TextStyle(
+        fontWeight: FontWeight.w500,
+        color: Config.primary_color,
+        fontSize: 18,
+        fontFamily:"Poppins");
+  }
+
+  cuadoTemaestilo() {
+    return BoxDecoration(
+      color: Config.white_color,
+      borderRadius: BorderRadius.circular(50.0),
+
+    );
+  }
 }
