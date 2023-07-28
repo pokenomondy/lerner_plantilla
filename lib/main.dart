@@ -28,7 +28,12 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
-      initialRoute: "/home",
+      initialRoute: "build-wait-screen",
+      routes: {
+        '/': ( _ ) => const waitScreenBuild(),
+        '/home': (context) => const Dashboard(),
+        '/home/temario': (context) => Temario()
+      },
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
@@ -141,12 +146,6 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
-      initialRoute: "build-wait-screen",
-      routes: {
-        '/': ( _ ) => const waitScreenBuild(),
-        '/home': (context) => const Dashboard(),
-        '/home/temario': (context) => Temario()
-      },
     );
   }
 }
