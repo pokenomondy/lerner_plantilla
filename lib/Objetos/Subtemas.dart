@@ -15,4 +15,22 @@ class SubTemas {
     };
   }
 
+  static SubTemas fromJson(Map<String, dynamic> json) {
+    String nombreSubTema = json['nombreSubTema'];
+    int ordenSubtema = json['ordenSubtema'];
+    List<dynamic> contenidosData = json['contenidos'];
+    List<Contenido> contenidos = contenidosData.map((contenidoData) => Contenido.fromJson(contenidoData)).toList();
+
+    return SubTemas(nombreSubTema, ordenSubtema, contenidos);
+  }
+
+  // Método para convertir la instancia de SubTemas a un mapa JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'nombreSubTema': nombreSubTema,
+      'ordenSubtema': ordenSubtema,
+      'contenidos': contenidos.map((contenido) => contenido.toJson()).toList(),
+    };
+  }
+
 }
