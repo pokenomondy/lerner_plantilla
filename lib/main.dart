@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:lerner_plantilla/Config/ConfigGeneral.dart';
 import 'package:lerner_plantilla/Pages/Dashboard.dart';
+import 'package:lerner_plantilla/Pages/Temario.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'Config/ConfigGeneral.dart';
 import 'Objetos/Contenido.dart';
@@ -25,7 +26,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
+      initialRoute: "/home",
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
@@ -138,6 +141,12 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
+      initialRoute: "build-wait-screen",
+      routes: {
+        '/': ( _ ) => const waitScreenBuild(),
+        '/home': (context) => const Dashboard(),
+        '/home/temario': (context) => Temario()
+      },
     );
   }
 }
