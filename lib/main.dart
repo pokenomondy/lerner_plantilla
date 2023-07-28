@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:lerner_plantilla/Config/ConfigGeneral.dart';
 import 'package:lerner_plantilla/Pages/Dashboard.dart';
+import 'package:lerner_plantilla/Pages/Temario.dart';
 import 'package:lerner_plantilla/screens/waitScreen.dart';
 
 
@@ -19,10 +20,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
-      initialRoute: "build-wait-screen",
+      initialRoute: "/home",
       routes: {
-        'build-wait-screen': ( _ ) => waitScreenBuild()
+        '/': ( _ ) => const waitScreenBuild(),
+        '/home': (context) => const Dashboard(),
+        '/home/temario': (context) => Temario()
       },
     );
   }
