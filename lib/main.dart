@@ -28,12 +28,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
-      initialRoute: "build-wait-screen",
-      routes: {
-        '/': ( _ ) => const waitScreenBuild(),
-        '/home': (context) => const Dashboard(),
-        '/home/temario': (context) => Temario()
-      },
+      initialRoute: "/home",
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
