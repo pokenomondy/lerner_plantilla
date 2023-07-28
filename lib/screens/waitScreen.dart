@@ -9,8 +9,8 @@ class waitScreenBuild extends StatelessWidget {
   @override
   Widget build(BuildContext context){
 
-    final currentwidth = MediaQuery.of(context).size.width;
-    final currentheight = MediaQuery.of(context).size.height;
+    final double currentwidth = MediaQuery.of(context).size.width;
+    final double currentheight = MediaQuery.of(context).size.height;
 
     return Scaffold(
       body: Container(
