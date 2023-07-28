@@ -23,124 +23,107 @@ class _TemarioState extends State<Temario> {
   List<Temas> temasList = [];
 
 
-  @override
-  void initState() {
-    super.initState();
-  }
-
 
   Future obtenerTemasDesdeFirebase() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool datosDescargados = prefs.getBool('datos_descargados_listatemas') ??
-        false;
-    if (!datosDescargados) {
-      CollectionReference referenceTemas = FirebaseFirestore.instance
-          .collection("MATERIAS").doc(Config.Tema_app).collection("TEMAS");
-      QuerySnapshot queryTemas = await referenceTemas.get();
-
-      for (var temaDoc in queryTemas.docs) {
-        String nombreTema = temaDoc['nombre Tema'];
-        int ordenTema = temaDoc['Orden tema'];
-        print("$ordenTema $nombreTema");
-
-        //Ahora metemos subtemas para crear la lista y guardar
-        QuerySnapshot subtemasDocs = await temaDoc.reference.collection(
-            'SUBTEMAS').get();
-        List<SubTemas> subtemasList = [];
-        for (var subtemaDoc in subtemasDocs.docs) {
-          String nombreSubTema = subtemaDoc['nombreSubTema']; // Suponiendo que 'nombreSubTema' es el campo que contiene el nombre del subtema
-          int ordenSubtema = subtemaDoc['ordenSubtema'];
-          print("$ordenSubtema $nombreSubTema");
-
-          //Ahora cargamos el contenido
-          QuerySnapshot contenidoDocs = await subtemaDoc.reference.collection(
-              "CONTENIDO").get();
-
-          List<Contenido> contenidos = [];
-          List<Map<String, dynamic>> contenidoData = [];
-          for (var contenidoDoc in contenidoDocs.docs) {
-            final data = contenidoDoc.data() as Map<String, dynamic>;
-            contenidoData =
-                (data['contenido'] as List).cast<Map<String, dynamic>>();
-            Contenido contenido = Contenido(contenidoData,);
-            contenidos.add(contenido);
-            print("contenido = $contenidoData");
-          }
-          //guaramos subtemas
-          SubTemas subtema = SubTemas(nombreSubTema, ordenSubtema, contenidos);
-          subtemasList.add(subtema);
-        }
-
-        //guardar temas en shared preferences
-        Temas tema = Temas(nombreTema, ordenTema, subtemasList);
-        temasList.add(tema);
-        print("temalist $temasList");
-      }
-      return temasList;
-    } else {
-
-    }
+    String temasJson = prefs.getString('temas_list') ?? '';
+    List<dynamic> temasData = jsonDecode(temasJson);
+    List temasList = temasData.map((temaData) => Temas.fromJson(temaData)).toList();
+    return temasList;
   }
+
+
 
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Config.colorPrincipal,
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.search),
+            onPressed: () {
+              // Aquí puedes agregar la lógica para realizar la búsqueda
+            },
+          ),
+        ],
+      ),
       body: Column(
         children: [
           FutureBuilder(
               future: obtenerTemasDesdeFirebase(),
-              builder: (context,snapshot){
-                List<Temas> temaslist = snapshot.data;
-                return Container(
-                  height: 600,
-                  child: ListView.builder(
-                    itemCount: temaslist.length,
-                    itemBuilder: (context, index) {
-                      Temas tema = temaslist[index];
-                      return Column(
-                        children: [
-                          Container(
-                            height: 40,
-                            child: ListTile(
-                              title: Text("${tema.ordentema} . ${tema.nombreTema}"),
+              builder: (context,snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  // Mientras se espera, mostrar un mensaje de carga
+                  return Center(
+                    child: CircularProgressIndicator(), // O cualquier otro widget de carga
+                  );
+                } else if (snapshot.hasError) {
+                  // Si ocurre un error en el Future, mostrar un mensaje de error
+                  return Center(
+                    child: Text("Error al cargar los datos"),
+                  );
+                } else {
+                  List<Temas> temaslist = snapshot.data;
+
+                  return Container(
+                    height: 600,
+                    child: ListView.builder(
+                      itemCount: temaslist.length,
+                      itemBuilder: (context, index) {
+                        Temas tema = temaslist[index];
+                        return Column(
+                          children: [
+                            Container(
+                              height: 40,
+                              child: ListTile(
+                                title: Text(
+                                    "${tema.ordentema} . ${tema.nombreTema}"),
+                              ),
                             ),
-                          ),
-                          ListView.builder(
-                            shrinkWrap: true,
-                            physics: NeverScrollableScrollPhysics(),
-                            itemCount: tema.subtemas.length,
-                            itemBuilder: (context, subIndex) {
-                              SubTemas subtema = tema.subtemas[subIndex];
-                              return Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 16.0),
-                                child: GestureDetector(
-                                  onTap: (){
-                                    print(subtema.nombreSubTema);
+                            ListView.builder(
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              itemCount: tema.subtemas.length,
+                              itemBuilder: (context, subIndex) {
+                                SubTemas subtema = tema.subtemas[subIndex];
+                                return Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 16.0),
+                                  child: GestureDetector(
+                                      onTap: () {
+                                        print(subtema.nombreSubTema);
 
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(builder: (context) =>  VistaContenido(contenidos: subtema.contenidos),
-                                      ),
-                                    );
-                                  },
-                                  child: Card(
-                                    child: Column(
-                                      children: [
-                                        Text("${tema.ordentema}.${subtema.ordenSubtema}.${subtema.nombreSubTema}"),
-                                      ],
-                                    ),
-                                  )
-                                ),
-                              );
-                            },
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-                );
-
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                VistaContenido(
+                                                    contenidos: subtema
+                                                        .contenidos),
+                                          ),
+                                        );
+                                      },
+                                      child: Card(
+                                        child: Column(
+                                          children: [
+                                            Text("${tema.ordentema}.${subtema
+                                                .ordenSubtema}.${subtema
+                                                .nombreSubTema}"),
+                                          ],
+                                        ),
+                                      )
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  );
+                }
               }
 
     ),
@@ -149,6 +132,8 @@ class _TemarioState extends State<Temario> {
 
     );
   }
+
+
 
 
 }
