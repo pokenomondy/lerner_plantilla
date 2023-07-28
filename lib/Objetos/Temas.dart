@@ -16,5 +16,23 @@ class Temas {
     };
   }
 
+  static Temas fromJson(Map<String, dynamic> json) {
+    String nombreTema = json['nombreTema'];
+    int ordenTema = json['ordenTema'];
+    List<dynamic> subtemasData = json['subtemasList'];
+    List<SubTemas> subtemasList = subtemasData.map((subtemaData) => SubTemas.fromJson(subtemaData)).toList();
+
+    return Temas(nombreTema, ordenTema, subtemasList);
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'nombreTema': nombreTema,
+      'ordenTema': ordentema,
+      'subtemasList': subtemas.map((subtema) => subtema.toJson()).toList(),
+    };
+  }
+
+
 }
 
