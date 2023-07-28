@@ -141,12 +141,6 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
-      initialRoute: "build-wait-screen",
-      routes: {
-        '/': ( _ ) => const waitScreenBuild(),
-        '/home': (context) => const Dashboard(),
-        '/home/temario': (context) => Temario()
-      },
     );
   }
 }
