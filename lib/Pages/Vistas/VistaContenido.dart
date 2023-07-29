@@ -1,11 +1,9 @@
 import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart' hide Text;
 import 'package:flutter_quill_extensions/embeds/builders.dart';
 import 'package:intl/intl.dart';
-
 import '../../Objetos/Contenido.dart';
 import '../../Widgets/FirebaseImageWidget.dart';
 import '../../Widgets/LatexEmbedBuilder.dart';
