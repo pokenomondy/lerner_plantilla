@@ -135,12 +135,13 @@ class _MyHomePageState extends State<MyHomePage> {
             ElevatedButton(onPressed: (){
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => Dashboard()),
+                MaterialPageRoute(builder: (context) => Temario()),
               );
       }, child: Text('A DASH')),
           ],
         ),
       ),
+
     );
   }
 }
