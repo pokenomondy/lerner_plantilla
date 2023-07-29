@@ -39,7 +39,7 @@ class _TemarioState extends State<Temario> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Config.colorPrincipal,
+        backgroundColor: Config.primary_color,
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.search),
