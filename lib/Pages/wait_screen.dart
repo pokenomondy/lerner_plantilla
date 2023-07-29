@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -29,18 +30,23 @@ class _CargarDatosState extends State<_CargarDatos>{
 
   final db = FirebaseFirestore.instance; //inicializar firebase
   List<Temas> temasList = [];
+  bool isLoading = false;
+  double progressValue = 0.0;
+  String progresstext = "0.0";
+  bool _datosdescargados = false; //datos descargados por parte de firebase
+
 
   @override
   void initState() {
     super.initState();
     obtenerTemasDesdeFirebase();
+
   }
 
-
   Future obtenerTemasDesdeFirebase() async {
+    startprogressindicator();
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool datosDescargados = prefs.getBool('datos_descargados_listatemas') ??
-        false;
+    bool datosDescargados = prefs.getBool('datos_descargados_listatemas') ?? false;
     if (!datosDescargados) {
       // print("Los datos apenas se van a descargar, priemra vez");
       CollectionReference referenceTemas = FirebaseFirestore.instance
@@ -84,11 +90,46 @@ class _CargarDatosState extends State<_CargarDatos>{
         temasList.add(tema);
         // print("temalist $temasList");
       }
+      setState(() {
+        _datosdescargados = true;
+      });
       guardardatos();
       return temasList;
     } else {
       // print('ya descargados los datos, se cargan de sharedpreferences');
+      setState(() {
+        _datosdescargados = true;
+      });
     }
+  }
+
+  void startprogressindicator() {
+    setState(() {
+      isLoading = true;
+      progressValue = 0;
+    });
+
+    const totalProgressTime = 2; // Tiempo total para llegar al 90%
+    const steps = 50; // Cantidad de pasos para el incremento
+
+    final stepDuration = Duration(milliseconds: (totalProgressTime * 1000) ~/ steps);
+
+    var currentStep = 0;
+
+    Timer.periodic(stepDuration, (timer) {
+      currentStep++;
+      setState(() {
+        progressValue = currentStep / steps * 0.9;
+        progresstext = (progressValue*100).toStringAsFixed(1);
+      });
+
+      if (currentStep == steps) {
+        timer.cancel();
+        if (_datosdescargados) {
+          completeprogress(); // Iniciar el progreso del 90% al 100%
+        }
+      }
+    });
   }
 
   Future guardardatos() async{
@@ -98,6 +139,37 @@ class _CargarDatosState extends State<_CargarDatos>{
     await prefs.setString('temas_list', temasJson); // Guardamos en shared preferecnes
     await prefs.setBool('datos_descargados_listatemas', true);
   }
+
+  void completeprogress(){
+    const completeDuration = 1000; // Tiempo para completar el 10% restante (desde el 90% hasta el 100%)
+    const steps = 10; // Cantidad de pasos para el incremento
+
+    final stepDuration = Duration(milliseconds: (completeDuration ~/ steps));
+    var currentStep = 0;
+
+    Timer.periodic(stepDuration, (timer) {
+      currentStep++;
+      setState(() {
+        progressValue = 0.9 + (currentStep / steps * 0.1);
+        progresstext = (progressValue * 100).toStringAsFixed(1);
+      });
+
+      if (currentStep == steps) {
+        timer.cancel();
+        setState(() {
+          isLoading = false;
+        });
+      }
+    });
+
+    _redireccionaDashboarc();
+  }
+
+  void _redireccionaDashboarc() {
+    Navigator.pushReplacementNamed(context, '/home');
+    print("redireccionar");
+  }
+
 
   @override
   Widget build(BuildContext context){
@@ -116,17 +188,41 @@ class _CargarDatosState extends State<_CargarDatos>{
             colors: [Config.second_color, Colors.white.withOpacity(0)],
           ),
         ),
-        child: const Column(
+        child:  Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             _DibujarLogo(),
             _EscribirFrase(),
-            LinearProgressIndicator()
+            Container(
+              width: currentwidth-180,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      width: currentwidth-220,
+                      child: Column(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(5),
+                            child: LinearProgressIndicator(
+                              value: progressValue,
+                              minHeight: 10,
+                              valueColor: AlwaysStoppedAnimation<Color>(Config.primary_color),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Text(progresstext.toString()),
+                  ],
+                )
+            ),
           ],
         ),
       ),
     );
   }
+
 }
 
 class _DibujarLogo extends StatelessWidget{
@@ -141,7 +237,7 @@ class _DibujarLogo extends StatelessWidget{
             fontFamily: "Poppins",
             fontWeight: FontWeight.w600,
             color: Config.second_color,
-            height: 0.4
+            height: 0.8
         ),),
         Text("Aprendizaje efectivo", style: TextStyle(
             fontSize: 20,

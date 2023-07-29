@@ -78,6 +78,7 @@ class _TemarioState extends State<Temario> {
 class CuadroTema extends StatefulWidget {
   final List<Temas> temaslist;
 
+
   CuadroTema(this.temaslist);
 
   @override
@@ -85,61 +86,117 @@ class CuadroTema extends StatefulWidget {
 }
 
 class _CuadroTemaState extends State<CuadroTema> {
+  int? _expandedIndex; // Rastrea el índice del tema expandido
+
+
   @override
   Widget build(BuildContext context) {
+    final double currentwidth = MediaQuery.of(context).size.width;
+    final double currentheight = MediaQuery.of(context).size.height;
+
     return Container(
-      height: 600,
+      height: currentheight-100,
       child: ListView.builder(
         itemCount: widget.temaslist.length,
         itemBuilder: (context, index) {
           Temas tema = widget.temaslist[index];
+          //estado de expandido
+          bool isExpanded = index == _expandedIndex;
 
           return Column(
             children: [
-
-              ExpansionTile(
-                title: Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Container(
-                    decoration: CuadroTemaDiseno(),
-                      height: 100,
+              Container(
+                child: ExpansionTile(
+                  onExpansionChanged: (expanded){
+                    setState(() {
+                      _expandedIndex = expanded ? index : null;
+                      print(_expandedIndex);
+                      print(isExpanded);
+                    });
+                  },
+                  title: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 5,vertical: 2),
+                    child: Container(
+                      decoration: CuadroTemaDiseno(isExpanded!),
+                        height: 90,
+                        child: Padding(
+                          padding: const EdgeInsets.all(15.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  textotituloTema("${tema.ordentema}. ${tema.nombreTema}"),
+                                  textoAuxiliarTema('${tema.subtemas.length} subtemas'),
+                              ],),
+                              Container(
+                                margin: EdgeInsets.only(top: 4),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text('Texto careverga de Diego'),
+                                  ],
+                                ),
+                              )
+                            ],
+                          ),
+                        )),
+                  ),
+                  children: tema.subtemas.map((subtema) {
+                    return GestureDetector(
+                      onTap: () {
+                        print(subtema.nombreSubTema);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => VistaContenido(
+                              contenidos: subtema.contenidos,
+                            ),
+                          ),
+                        );
+                      },
                       child: Padding(
-                        padding: const EdgeInsets.all(15.0),
-                        child: Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                textotituloTema("${tema.ordentema}.${tema.nombreTema}"),
-                                Text('## subtemas'),
-                            ],)
-                          ],
-                        ),
-                      )),
-                ),
-                children: tema.subtemas.map((subtema) {
-                  return GestureDetector(
-                    onTap: () {
-                      print(subtema.nombreSubTema);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => VistaContenido(
-                            contenidos: subtema.contenidos,
+                        padding: const EdgeInsets.symmetric(horizontal: 0,vertical: 5),
+                        child: Container(
+                          margin: EdgeInsets.only(left: 50,right: 30),
+                          decoration: CuadroSubTemaDiseno(),
+                          height: 56,
+                          child: Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Container(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Column(
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          textotituloSubTema("${tema.ordentema}.${subtema.ordenSubtema}.${subtema.nombreSubTema}"),
+                                          Container(
+                                            margin: EdgeInsets.only(top: 4),
+                                            child: textotituloSubTema('## documentos'),)
+                                        ],
+                                      ),
+                                      Icon(Icons.not_started,color: Config.white_color, size: 40,)
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                         ),
-                      );
-                    },
-                    child: Card(
-                      child: Padding(
-                        padding: EdgeInsets.all(16.0),
-                        child: Text(
-                          "${tema.ordentema}.${subtema.ordenSubtema}.${subtema.nombreSubTema}",
-                        ),
                       ),
-                    ),
-                  );
-                }).toList(),
+                    );
+                  }).toList(),
+                ),
               ),
             ],
           );
@@ -149,13 +206,31 @@ class _CuadroTemaState extends State<CuadroTema> {
   }
 
   textotituloTema(String texto){
-    return Text(texto,style: TextStyle(fontWeight: FontWeight.bold,color: Config.primary_color),);
+    return Text(texto,style: TextStyle(fontWeight: FontWeight.bold,color: Config.primary_color,fontFamily: "Poppins",fontSize: 14),);
   }
 
-  CuadroTemaDiseno() {
+  textoAuxiliarTema(String texto){
+    return Text(texto,style: TextStyle(fontWeight: FontWeight.bold,color: Colors.black,fontFamily: "Poppins",fontSize: 10),);
+  }
+
+  textotituloSubTema(String texto){
+    return Text(texto,style: TextStyle(color: Config.white_color,fontFamily: "Poppins",fontSize: 11),);
+  }
+
+
+  CuadroTemaDiseno(bool isExpanded) {
     return BoxDecoration(
       color: Config.white_color,
       borderRadius: BorderRadius.circular(20.0),
+      border: isExpanded ? Border.all(color: Config.primary_color, width: 2.0) : Border(),
+
+    );
+  }
+
+  CuadroSubTemaDiseno() {
+    return BoxDecoration(
+      color: Config.primary_color,
+      borderRadius: BorderRadius.circular(12.0),
 
     );
   }
