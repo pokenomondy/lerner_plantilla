@@ -9,4 +9,22 @@ class Config {
   static const Color gray_color = Color(0xFF3C3C3B);
   static const String Tema_app = "CALCULO 1";
 
+  BoxShadow aplicarSombra(double opacity, double spreadradius, double blur, Offset coordenadas){
+    return BoxShadow(
+        color: gray_color.withOpacity(opacity),
+        spreadRadius: spreadradius,
+        blurRadius: blur,
+        offset: coordenadas
+    );
+  }
+
+  TextStyle aplicarEstilo(Color color, double fontSize, bool isBold){
+    FontWeight fontWeight = (isBold) ? FontWeight.w500 : FontWeight.w300;
+    return TextStyle(
+        fontWeight: fontWeight,
+        color: color,
+        fontFamily: "Poppins",
+        fontSize: fontSize);
+  }
+
 }
