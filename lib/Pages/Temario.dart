@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:lerner_plantilla/Config/ConfigGeneral.dart';
+import 'package:lerner_plantilla/Config/config_general.dart';
 import 'package:lerner_plantilla/Pages/Vistas/VistaContenido.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -38,7 +38,7 @@ class _TemarioState extends State<Temario> {
     final currentheight = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Config.primary_color,
+        backgroundColor: Config.primaryColor,
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.search),
@@ -140,7 +140,6 @@ class _CuadroTemaState extends State<CuadroTema> {
         },
         children: [
         ExpansionPanel(
-        hasIcon: false,
         canTapOnHeader: true,
         headerBuilder: (context, isOpen) {
           return Container(
@@ -182,14 +181,14 @@ class _CuadroTemaState extends State<CuadroTema> {
   estilotexto(){
     return TextStyle(
         fontWeight: FontWeight.w500,
-        color: Config.primary_color,
+        color: Config.primaryColor,
         fontSize: 18,
         fontFamily:"Poppins");
   }
 
   cuadoTemaestilo() {
     return BoxDecoration(
-      color: Config.white_color,
+      color: Config.whiteColor,
       borderRadius: BorderRadius.circular(50.0),
 
     );

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lerner_plantilla/Config/ConfigGeneral.dart';
+import 'package:lerner_plantilla/Config/config_general.dart';
 
 class Dashboard extends StatelessWidget {
 
@@ -11,10 +11,10 @@ class Dashboard extends StatelessWidget {
     final double currentwidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
+      appBar: Config().defaultAppBar(),
       body: Center(
         child: Column(
           children: [
-            _Crearbuscador(currentwidth: currentwidth,),
             _CrearBoton(title: "Ver temario", subtitle: "Oprima para ver el temario \ndel area", currentwidth: currentwidth, imageRoute: 'assets/sources/temario.jpg', destinationRoute: '/home/temario',),
             _CrearBoton(title: "Hacer ejercicio", subtitle: "Ejercicios para prepararte \npara tus examenes", currentwidth: currentwidth, imageRoute: 'assets/sources/ejercicio.jpg', destinationRoute: '/home/temario',)
           ],
@@ -23,28 +23,6 @@ class Dashboard extends StatelessWidget {
     );
   }
 
-}
-
-class _Crearbuscador extends StatelessWidget{
-  const _Crearbuscador({Key?key, required this.currentwidth}): super(key:key);
-  final double currentwidth;
-
-  @override
-  Widget build(BuildContext context){
-    Config configuracion = Config();
-
-    return Container(
-      width: currentwidth,
-      height: 80,
-      decoration: BoxDecoration(
-        color: Config.second_color,
-        boxShadow: [configuracion.aplicarSombra(0.3, 5, 7, const Offset(0, 3))]
-      ),
-      child: Center(
-        child: Text("Buscador aqui", style: configuracion.aplicarEstilo(Config.white_color, 18, true)),
-      ),
-    );
-  }
 }
 
 
@@ -92,11 +70,11 @@ class _CrearBotonState extends State<_CrearBoton> {
         });
       },
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
+        duration: const Duration(milliseconds: 400),
         curve: Curves.easeInOut,
         margin: const EdgeInsets.only(top: 20),
         decoration: BoxDecoration(
-          color: isPressed ? Config.second_color : Config.white_color,
+          color: isPressed ? Config.secondColor : Config.whiteColor,
           borderRadius: BorderRadius.circular(15),
           boxShadow: [configuracion.aplicarSombra(0.1, 3, 7, const Offset(0, 1))],
         ),
@@ -183,11 +161,11 @@ class _ContentState extends State<_Content>{
         children: [
           Padding(
             padding: const EdgeInsets.only(bottom: 2) ,
-            child: Text(widget.title, style: configuracion.aplicarEstilo(widget.isPressed ? Colors.white : Config.second_color, 18, true)),
+            child: Text(widget.title, style: configuracion.aplicarEstilo(widget.isPressed ? Colors.white : Config.secondColor, 18, true)),
           ),
           Padding(
             padding: const EdgeInsets.only(bottom: 10),
-            child: Text(widget.subtitle, style: configuracion.aplicarEstilo(widget.isPressed ? Colors.white : Config.gray_color, 14, false),
+            child: Text(widget.subtitle, style: configuracion.aplicarEstilo(widget.isPressed ? Colors.white : Config.grayColor, 14, false),
               maxLines: null,
               textAlign: TextAlign.justify,
             ),

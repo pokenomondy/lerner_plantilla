@@ -1,6 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:lerner_plantilla/Pages/Dashboard.dart';
+import 'package:lerner_plantilla/Pages/dashboard.dart';
 import 'package:lerner_plantilla/Pages/Temario.dart';
 import 'package:lerner_plantilla/Pages/wait_screen.dart';
 
