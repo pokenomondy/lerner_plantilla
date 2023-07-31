@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:lerner_plantilla/Config/ConfigGeneral.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../Config/config_general.dart';
 import '../Objetos/Contenido.dart';
 import '../Objetos/Subtemas.dart';
 import '../Objetos/Temas.dart';
@@ -49,7 +49,7 @@ class _CargarDatosState extends State<_CargarDatos>{
     if (!datosDescargados) {
       // print("Los datos apenas se van a descargar, priemra vez");
       CollectionReference referenceTemas = FirebaseFirestore.instance
-          .collection("MATERIAS").doc(Config.Tema_app).collection("TEMAS");
+          .collection("MATERIAS").doc(Config.temaApp).collection("TEMAS");
       QuerySnapshot queryTemas = await referenceTemas.get();
 
       for (var temaDoc in queryTemas.docs) {
@@ -184,7 +184,7 @@ class _CargarDatosState extends State<_CargarDatos>{
           gradient: LinearGradient(
             begin: Alignment.bottomCenter,
             end: const Alignment(0,0.3),
-            colors: [Config.second_color, Colors.white.withOpacity(0)],
+            colors: [Config.secondColor, Colors.white.withOpacity(0)],
           ),
         ),
         child:  Column(
@@ -206,7 +206,7 @@ class _CargarDatosState extends State<_CargarDatos>{
                             child: LinearProgressIndicator(
                               value: progressValue,
                               minHeight: 10,
-                              valueColor: AlwaysStoppedAnimation<Color>(Config.primary_color),
+                              valueColor: AlwaysStoppedAnimation<Color>(Config.primaryColor),
                             ),
                           ),
                         ],
@@ -235,14 +235,14 @@ class _DibujarLogo extends StatelessWidget{
             fontSize: 75,
             fontFamily: "Poppins",
             fontWeight: FontWeight.w600,
-            color: Config.second_color,
+            color: Config.secondColor,
             height: 0.8
         ),),
         Text("Aprendizaje efectivo", style: TextStyle(
             fontSize: 20,
             fontFamily: "Poppins",
             fontWeight: FontWeight.w300,
-            color: Config.gray_color
+            color: Config.grayColor
         ),)
       ],
     );
@@ -260,7 +260,7 @@ class _EscribirFrase extends StatelessWidget {
        textAlign: TextAlign.center,
          text: const TextSpan(
        style: TextStyle(
-         color: Config.gray_color,
+         color: Config.grayColor,
          fontFamily: "Poppins",
          fontSize: 18,
          fontWeight: FontWeight.w300
@@ -268,7 +268,7 @@ class _EscribirFrase extends StatelessWidget {
          children: [
          TextSpan(text: "Preparate para tus "),
          TextSpan(text: "examenes\n", style: TextStyle(
-           color: Config.second_color,
+           color: Config.secondColor,
            fontWeight: FontWeight.w500
          )),
          TextSpan(text: " de la mejor manera")
