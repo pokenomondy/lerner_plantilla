@@ -35,7 +35,6 @@ class _CargarDatosState extends State<_CargarDatos>{
   String progresstext = "0.0";
   bool _datosdescargados = false; //datos descargados por parte de firebase
 
-
   @override
   void initState() {
     super.initState();
