@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:lerner_plantilla/Delegates/subtemas_delegate.dart';
-import '../Objetos/Temas.dart';
 import '../Config/config_general.dart';
 
 class SearchBuild extends StatefulWidget {

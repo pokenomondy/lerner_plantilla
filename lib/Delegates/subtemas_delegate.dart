@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../Config/config_general.dart';
 import '../Objetos/Temas.dart';
+import '../Objetos/Subtemas.dart';
+import '../Pages/Vistas/VistaContenido.dart';
 
 class SearchDelegateSubtemas extends SearchDelegate {
   late List<Temas> temario;
@@ -32,7 +34,23 @@ class SearchDelegateSubtemas extends SearchDelegate {
 
   @override
   Widget buildResults(BuildContext context) {
-    return const Text("buildResults");
+    List<SubTemas> subtemas = [];
+
+    for(int index=0; index<temario.length; index++){
+      if(temario[index].subtemas.isNotEmpty){
+        for(int subindex=0; subindex<temario[index].subtemas.length; subindex++){
+          if(temario[index].subtemas[subindex].nombreSubTema.toLowerCase().contains(query.toLowerCase())){
+            subtemas.add(temario[index].subtemas[subindex]);
+          }
+        }
+      }
+    }
+
+    if(subtemas.isNotEmpty){
+      return _TarjetasDeSubtemas(subtemario: subtemas);
+    }else{
+      return const _NoEncontrada();
+    }
   }
 
   @override
@@ -41,25 +59,63 @@ class SearchDelegateSubtemas extends SearchDelegate {
       future: Config().obtenerTemasDesdeFirebase(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Text("");
+          return const Center(
+            child: CircularProgressIndicator(
+              strokeWidth: 4,
+            ),
+          );
         } else if (snapshot.hasError) {
           return Text("Ups! Ha ocurrido un error",
               style: Config().aplicarEstilo(Config.secondColor, 20, true));
         } else {
           temario = snapshot.data;
         }
-        return _TarjetasDeSubtemas(temario: temario);
+
+        List<SubTemas> subtemas = [];
+
+        for(int index=0; index<temario.length; index++){
+          if(temario[index].subtemas.isNotEmpty){
+            for(int subindex=0; subindex<temario[index].subtemas.length; subindex++){
+              if(temario[index].subtemas[subindex].nombreSubTema.toLowerCase().contains(query.toLowerCase())){
+                subtemas.add(temario[index].subtemas[subindex]);
+              }
+            }
+          }
+        }
+
+        if(subtemas.isNotEmpty){
+          return _TarjetasDeSubtemas(subtemario: subtemas);
+        }else{
+          return const _NoEncontrada();
+        }
       },
     );
   }
 }
 
+class _NoEncontrada extends StatelessWidget{
+  const _NoEncontrada({
+    Key?key,
+  }):super(key:key);
+
+  @override
+  Widget build(BuildContext context){
+    return Center(
+        child: Text(
+          "Busqueda no encontrada",
+          style: Config().aplicarEstilo(Config.secondColor, 40, true),
+          textAlign: TextAlign.center,
+        )
+    );
+  }
+}
+
 class _TarjetasDeSubtemas extends StatefulWidget {
-  final List<Temas> temario;
+  final List<SubTemas> subtemario;
 
   const _TarjetasDeSubtemas({
     Key? key,
-    required this.temario,
+    required this.subtemario,
   }) : super(key: key);
 
   @override
@@ -67,121 +123,38 @@ class _TarjetasDeSubtemas extends StatefulWidget {
 }
 
 class _TarjetasDeSubtemasState extends State<_TarjetasDeSubtemas> {
-  late Map<String, int> selectedIndexValue = {'index': -1, 'subindex': -1};
-  late bool isPressed;
   late double containerHeight = 0.0;
 
-  void _enviarASubtema(subtema){
-    Navigator.pushNamed(context, '');
-  }
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
         ListView.builder(
-          itemCount: widget.temario.length,
-          itemBuilder: (context, index) {
-            List<Widget> subtemas = [];
-            if (index != widget.temario.length) {
-              if (widget.temario[index].subtemas.isNotEmpty) {
-                for (int subindex = 0;
-                    subindex < widget.temario[index].subtemas.length;
-                    subindex++) {
-                  isPressed = (selectedIndexValue['index'] == index && selectedIndexValue['subindex'] == subindex);
-                  subtemas.add(_AgregarSubtema(
-                    subtema:
-                        widget.temario[index].subtemas[subindex].nombreSubTema,
-                    isPressed: isPressed,
-                    onTap: () {
-                      setState(() {
-                        if (selectedIndexValue['index'] == index && selectedIndexValue['subindex'] == subindex) {
-                          selectedIndexValue['index'] = -1;
-                          containerHeight = 0.0;
-                        } else {
-                          selectedIndexValue['index'] = index;
-                          selectedIndexValue['subindex'] = subindex;
-                          containerHeight = 1;
-                        }
-                      });
-                    },
-                  ));
-                }
-                return Column(
-                  children: subtemas,
-                );
-              }
-            }
-            return null;
-          },
+          itemCount: widget.subtemario.length,
+          itemBuilder: (context, index){
+            return _AgregarSubtema(
+              subtema: widget.subtemario[index].nombreSubTema,
+              onTap: (){
+                Navigator.push(context, MaterialPageRoute(builder: (context) => VistaContenido(contenidos: widget.subtemario[index].contenidos)));
+              },
+            );
+          }
         ),
-        if(selectedIndexValue['index']!=-1)
-        _IrASubtema(subtema: selectedIndexValue, containerHeight: containerHeight),
       ],
     );
   }
 }
 
-class _IrASubtema extends StatefulWidget{
-  final Map<String, int> subtema;
-  final double containerHeight;
-  
-  const _IrASubtema({
-    Key?key,
-    required this.subtema,
-    required this.containerHeight
-  }):super(key:key);
-  
-  @override
-  _IrASubtemaState createState() => _IrASubtemaState();
-}
-
-class _IrASubtemaState extends State<_IrASubtema>{
-  @override
-  Widget build(BuildContext context){
-    return Positioned(
-        bottom: 0,
-        left: 0,
-        right: 0,
-        child: GestureDetector(
-          onTap: (){},
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 400),
-            transform: Matrix4.translationValues(0.0, widget.containerHeight, 0.0),
-            alignment: Alignment.center,
-            width: double.infinity,
-            decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(20),
-                    topRight: Radius.circular(20)),
-                border: Border.all(color: Config.secondColor, width: 3),
-                boxShadow: [
-                  Config().aplicarSombra(0.5, 5, 7, const Offset(0, 3))
-                ]),
-            child: Padding(
-                padding: const EdgeInsets.only(top: 8, bottom: 12),
-                child: Text(
-                  "Ir al subtema",
-                  style:
-                  Config().aplicarEstilo(Config.secondColor, 25, true),
-                )),
-          ),
-        ));
-  }
-}
-
-
 class _AgregarSubtema extends StatefulWidget {
   final String subtema;
-  final bool isPressed;
   final VoidCallback onTap;
 
   const _AgregarSubtema(
       {Key? key,
       required this.subtema,
-      required this.isPressed,
-      required this.onTap})
+      required this.onTap,
+      })
       : super(key: key);
 
   @override
@@ -189,20 +162,39 @@ class _AgregarSubtema extends StatefulWidget {
 }
 
 class _AgregarSubtemaState extends State<_AgregarSubtema> {
+
+  late bool isPressed = false;
+
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: widget.onTap,
+      onTapDown: (_) {
+        setState(() {
+          isPressed = true;
+        });
+      },
+      onTapCancel: () {
+        setState(() {
+          isPressed = false;
+        });
+      },
+      onTapUp: (_) {
+        setState(() {
+          isPressed = false;
+        });
+      },
       child: AnimatedContainer(
         margin: const EdgeInsets.only(top: 10, left: 10, right: 10),
         duration: const Duration(milliseconds: 400),
         width: double.infinity,
         decoration: BoxDecoration(
-            color: widget.isPressed ? Colors.white : Config.secondColor,
+            color: isPressed ? Colors.white : Config.secondColor,
             borderRadius: BorderRadius.circular(15),
             boxShadow: [Config().aplicarSombra(0.1, 5, 7, const Offset(0, 3))],
             border: Border.all(
-                color: widget.isPressed
+                color: isPressed
                     ? Config.secondColor
                     : Config.secondColor.withOpacity(0),
                 width: 2)),
@@ -211,7 +203,7 @@ class _AgregarSubtemaState extends State<_AgregarSubtema> {
           child: Text(
             widget.subtema,
             style: Config().aplicarEstilo(
-                widget.isPressed ? Config.secondColor : Colors.white,
+                isPressed ? Config.secondColor : Colors.white,
                 17,
                 false),
           ),
