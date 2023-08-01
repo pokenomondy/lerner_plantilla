@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../Config/config_general.dart';
 import '../Objetos/Contenido.dart';
+import '../Objetos/Parciales.dart';
 import '../Objetos/Subtemas.dart';
 import '../Objetos/Temas.dart';
 
@@ -26,10 +27,11 @@ class _CargarDatos extends StatefulWidget{
   _CargarDatosState createState() => _CargarDatosState();
 }
 
-class _CargarDatosState extends State<_CargarDatos>{
+class _CargarDatosState extends State<_CargarDatos> {
 
   final db = FirebaseFirestore.instance; //inicializar firebase
   List<Temas> temasList = [];
+  List<Parciales> parcialesList = [];
   bool isLoading = false;
   double progressValue = 0.0;
   String progresstext = "0.0";
@@ -39,36 +41,44 @@ class _CargarDatosState extends State<_CargarDatos>{
   void initState() {
     super.initState();
     actualizarapp();
+    //a parciales desde firebase no se le va a meter ningun metodo todavia
+    obtenerParcialesDesdeFirebase();
   }
 
-  Future actualizarapp() async{
+  Future actualizarapp() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool datosDescargados = prefs.getBool('datos_actualizacion') ?? false;
     if (!datosDescargados) {
-      DocumentSnapshot getactualizacion = await FirebaseFirestore.instance.collection("MATERIAS").doc(Config.temaApp).get();
-      DateTime actualizacion = getactualizacion.get('fecha actualizacion').toDate();
+      DocumentSnapshot getactualizacion = await FirebaseFirestore.instance
+          .collection("MATERIAS").doc(Config.temaApp).get();
+      DateTime actualizacion = getactualizacion.get('fecha actualizacion')
+          .toDate();
       print(actualizacion);
-      await prefs.setString("actualizacionTemas",actualizacion.toString() ); // Guardamos en shared preferecnes
+      await prefs.setString("actualizacionTemas",
+          actualizacion.toString()); // Guardamos en shared preferecnes
       await prefs.setBool('datos_actualizacion', true);
       obtenerTemasDesdeFirebase();
-    }else{
-      DocumentSnapshot getactualizacion = await FirebaseFirestore.instance.collection("MATERIAS").doc(Config.temaApp).get();
-      DateTime actualizacion = getactualizacion.get('fecha actualizacion').toDate();
+    } else {
+      DocumentSnapshot getactualizacion = await FirebaseFirestore.instance
+          .collection("MATERIAS").doc(Config.temaApp).get();
+      DateTime actualizacion = getactualizacion.get('fecha actualizacion')
+          .toDate();
       //Ahora revisemos, comprar lo que tenemos guardado con lo que se en firebase
       String act = prefs.getString('actualizacionTemas') ?? '';
       DateTime actguardado = DateTime.parse(act);
       print(act);
       print(actguardado);
-      if(actguardado==actualizacion){
+      if (actguardado == actualizacion) {
         print("sin actualizar");
         obtenerTemasDesdeFirebase();
-      }else{
+      } else {
         //eliminar variables para actualizar
         print("a actualizar");
         await prefs.remove('temas_list');
         await prefs.setBool('datos_descargados_listatemas', false);
         await prefs.remove('actualizacionTemas');
-        await prefs.setString("actualizacionTemas",actualizacion.toString() ); // Guardamos en shared preferecnes
+        await prefs.setString("actualizacionTemas",
+            actualizacion.toString()); // Guardamos en shared preferecnes
         obtenerTemasDesdeFirebase();
       }
     }
@@ -77,7 +87,8 @@ class _CargarDatosState extends State<_CargarDatos>{
   Future obtenerTemasDesdeFirebase() async {
     startprogressindicator();
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool datosDescargados = prefs.getBool('datos_descargados_listatemas') ?? false;
+    bool datosDescargados = prefs.getBool('datos_descargados_listatemas') ??
+        false;
     if (!datosDescargados) {
       print("descargar datos");
       // print("Los datos apenas se van a descargar, priemra vez");
@@ -125,13 +136,60 @@ class _CargarDatosState extends State<_CargarDatos>{
       setState(() {
         _datosdescargados = true;
       });
-      guardardatos();
+      guardardatos("temas");
       return temasList;
     } else {
       print('ya descargados los datos, se cargan de sharedpreferences');
       setState(() {
         _datosdescargados = true;
       });
+    }
+  }
+
+  Future obtenerParcialesDesdeFirebase() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool datosDescargados = prefs.getBool('datos_descargados_parciales') ?? false;
+    if (!datosDescargados) {
+
+      print('obtengamos parciales');
+      CollectionReference referenceParciales = FirebaseFirestore.instance
+          .collection("PARCIALES")
+          .doc(Config.temaApp)
+          .collection("PARCIALES");
+      QuerySnapshot queryParciales = await referenceParciales.get();
+
+      for (var parcialDoc in queryParciales.docs) {
+        String fraseParcial = parcialDoc['fraseparcial'];
+        String universidad = parcialDoc['universidad'];
+        String materia = parcialDoc['materia'];
+        List<dynamic> temaDynamic = parcialDoc['tema'];
+        List<dynamic> subtemasDynamic = parcialDoc['subtemas'];
+        List<String> tema = temaDynamic.cast<String>();
+        List<String> subtemas = subtemasDynamic.cast<String>();
+        String indicedificultad = parcialDoc['indicedificultad'];
+
+          //cargamos contenido
+          QuerySnapshot contenidoDocs = await parcialDoc.reference.collection("CONTENIDO").get();
+          List<Contenido> contenidos = [];
+          List<Map<String,dynamic>> contenidoData = [];
+
+          for (var contenidoDoc in contenidoDocs.docs){
+            final data = contenidoDoc.data() as Map<String, dynamic>;
+            contenidoData =
+                (data['contenido'] as List).cast<Map<String, dynamic>>();
+            Contenido contenido = Contenido(contenidoData,);
+            contenidos.add(contenido);
+            print("contenido = $contenidoData");
+          }
+        Parciales newparcial = Parciales(fraseParcial, universidad, materia,
+            tema, subtemas, indicedificultad,contenidos);
+        parcialesList.add(newparcial);
+      }
+
+      guardardatos("parciales");
+      return parcialesList;
+    }else{
+      print("ya descargados los parciales");
     }
   }
 
@@ -164,12 +222,22 @@ class _CargarDatosState extends State<_CargarDatos>{
     });
   }
 
-  Future guardardatos() async{
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    // print("se guardan datos");
-    String temasJson = jsonEncode(temasList); //convertios a Json para guardar
-    await prefs.setString('temas_list', temasJson); // Guardamos en shared preferecnes
-    await prefs.setBool('datos_descargados_listatemas', true);
+  Future guardardatos(String parcialtema) async{
+    if(parcialtema=="parciales"){
+      print("se guardan datos de parciales");
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      // print("se guardan datos");
+      String temasJson = jsonEncode(parcialesList);
+      print(temasJson);//convertios a Json para guardar
+      await prefs.setString('parcial_list', temasJson); // Guardamos en shared preferecnes
+      await prefs.setBool('datos_descargados_parciales', true);
+    }else{
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      // print("se guardan datos");
+      String temasJson = jsonEncode(temasList); //convertios a Json para guardar
+      await prefs.setString('temas_list', temasJson); // Guardamos en shared preferecnes
+      await prefs.setBool('datos_descargados_listatemas', true);
+    }
   }
 
   void completeprogress(){
