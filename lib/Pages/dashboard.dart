@@ -21,7 +21,7 @@ class Dashboard extends StatelessWidget {
           Navigator.pushNamed(context, '/');
 
         }
-            , child: Text(' a pantalla de carga')),
+            , child: const Text(' a pantalla de carga')),
           ],
         ),
       ),
@@ -29,7 +29,6 @@ class Dashboard extends StatelessWidget {
   }
 
 }
-
 
 class _CrearBoton extends StatefulWidget{
 
