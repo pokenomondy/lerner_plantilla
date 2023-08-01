@@ -34,7 +34,7 @@ class ExpansionListLernenState extends State<ExpansionListLernen>{
 
     for(int i=0; i<widget.subtemario.length; i++){
       if(widget.subtemario[i].isNotEmpty){
-        subtemas.add(Padding(padding: const EdgeInsets.only(left: 10),child: Text(widget.subtemario[i], style: Config().aplicarEstilo(Colors.white, 13, false),)));
+        subtemas.add(Padding(padding: const EdgeInsets.only(left: 10),child: Text("- ${widget.subtemario[i]}", style: Config().aplicarEstilo(Colors.white, 13, false),)));
       }
     }
 
@@ -100,13 +100,16 @@ class ExpansionListLernenState extends State<ExpansionListLernen>{
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: subtemas,
+                    SizedBox(
+                      width: 220,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: subtemas,
+                      ),
                     ),
                     Container(
-                      margin: const EdgeInsets.only(right: 7),
+                      margin: const EdgeInsets.only(right: 15),
                       alignment: Alignment.center,
                       decoration:
                       const BoxDecoration(shape: BoxShape.circle, color: Colors.white),
