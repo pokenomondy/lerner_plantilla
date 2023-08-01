@@ -38,8 +38,40 @@ class _CargarDatosState extends State<_CargarDatos>{
   @override
   void initState() {
     super.initState();
-    obtenerTemasDesdeFirebase();
+    actualizarapp();
+  }
 
+  Future actualizarapp() async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool datosDescargados = prefs.getBool('datos_actualizacion') ?? false;
+    if (!datosDescargados) {
+      DocumentSnapshot getactualizacion = await FirebaseFirestore.instance.collection("MATERIAS").doc(Config.temaApp).get();
+      DateTime actualizacion = getactualizacion.get('fecha actualizacion').toDate();
+      print(actualizacion);
+      await prefs.setString("actualizacionTemas",actualizacion.toString() ); // Guardamos en shared preferecnes
+      await prefs.setBool('datos_actualizacion', true);
+      obtenerTemasDesdeFirebase();
+    }else{
+      DocumentSnapshot getactualizacion = await FirebaseFirestore.instance.collection("MATERIAS").doc(Config.temaApp).get();
+      DateTime actualizacion = getactualizacion.get('fecha actualizacion').toDate();
+      //Ahora revisemos, comprar lo que tenemos guardado con lo que se en firebase
+      String act = prefs.getString('actualizacionTemas') ?? '';
+      DateTime actguardado = DateTime.parse(act);
+      print(act);
+      print(actguardado);
+      if(actguardado==actualizacion){
+        print("sin actualizar");
+        obtenerTemasDesdeFirebase();
+      }else{
+        //eliminar variables para actualizar
+        print("a actualizar");
+        await prefs.remove('temas_list');
+        await prefs.setBool('datos_descargados_listatemas', false);
+        await prefs.remove('actualizacionTemas');
+        await prefs.setString("actualizacionTemas",actualizacion.toString() ); // Guardamos en shared preferecnes
+        obtenerTemasDesdeFirebase();
+      }
+    }
   }
 
   Future obtenerTemasDesdeFirebase() async {
@@ -47,6 +79,7 @@ class _CargarDatosState extends State<_CargarDatos>{
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool datosDescargados = prefs.getBool('datos_descargados_listatemas') ?? false;
     if (!datosDescargados) {
+      print("descargar datos");
       // print("Los datos apenas se van a descargar, priemra vez");
       CollectionReference referenceTemas = FirebaseFirestore.instance
           .collection("MATERIAS").doc(Config.temaApp).collection("TEMAS");
@@ -95,7 +128,7 @@ class _CargarDatosState extends State<_CargarDatos>{
       guardardatos();
       return temasList;
     } else {
-      // print('ya descargados los datos, se cargan de sharedpreferences');
+      print('ya descargados los datos, se cargan de sharedpreferences');
       setState(() {
         _datosdescargados = true;
       });
@@ -166,7 +199,6 @@ class _CargarDatosState extends State<_CargarDatos>{
 
   void _redireccionaDashboarc() {
     Navigator.pushReplacementNamed(context, '/home');
-    print("redireccionar");
   }
 
 
