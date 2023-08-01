@@ -42,32 +42,36 @@ class _CargarDatosState extends State<_CargarDatos> {
     super.initState();
     actualizarapp();
     //a parciales desde firebase no se le va a meter ningun metodo todavia
-    obtenerParcialesDesdeFirebase();
   }
 
   Future actualizarapp() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool datosDescargados = prefs.getBool('datos_actualizacion') ?? false;
     if (!datosDescargados) {
+      //Obtener actualización de temas
       DocumentSnapshot getactualizacion = await FirebaseFirestore.instance
           .collection("MATERIAS").doc(Config.temaApp).get();
       DateTime actualizacion = getactualizacion.get('fecha actualizacion')
           .toDate();
-      print(actualizacion);
-      await prefs.setString("actualizacionTemas",
-          actualizacion.toString()); // Guardamos en shared preferecnes
+      //obtenemos actualización de temas
+      DocumentSnapshot getactualizacionparcial = await FirebaseFirestore.instance
+          .collection("PARCIALES").doc(Config.temaApp).get();
+      DateTime actualizacionparcial = getactualizacionparcial.get('fecha actualizacion')
+          .toDate();
+      print("actparcial $actualizacionparcial");
+      //guardo actualizacion temas
+      await prefs.setString("actualizacionTemas", actualizacion.toString()); // Guardamos en shared preferecnes
       await prefs.setBool('datos_actualizacion', true);
       obtenerTemasDesdeFirebase();
+      obtenerParcialesDesdeFirebase();
+      //guardaractualizacion de parciales
+      await prefs.setString("actualizacionParciales", actualizacionparcial.toString()); // Guardamos en shared preferecnes
     } else {
-      DocumentSnapshot getactualizacion = await FirebaseFirestore.instance
-          .collection("MATERIAS").doc(Config.temaApp).get();
-      DateTime actualizacion = getactualizacion.get('fecha actualizacion')
-          .toDate();
-      //Ahora revisemos, comprar lo que tenemos guardado con lo que se en firebase
+      //temas
+      DocumentSnapshot getactualizacion = await FirebaseFirestore.instance.collection("MATERIAS").doc(Config.temaApp).get();
+      DateTime actualizacion = getactualizacion.get('fecha actualizacion').toDate();
       String act = prefs.getString('actualizacionTemas') ?? '';
       DateTime actguardado = DateTime.parse(act);
-      print(act);
-      print(actguardado);
       if (actguardado == actualizacion) {
         print("sin actualizar");
         obtenerTemasDesdeFirebase();
@@ -81,6 +85,26 @@ class _CargarDatosState extends State<_CargarDatos> {
             actualizacion.toString()); // Guardamos en shared preferecnes
         obtenerTemasDesdeFirebase();
       }
+      //parciales
+      DocumentSnapshot getactualizacionparcial = await FirebaseFirestore.instance.collection("PARCIALES").doc(Config.temaApp).get();
+      DateTime actualizacionparcial = getactualizacionparcial.get('fecha actualizacion').toDate();
+      String actparcial = prefs.getString('actualizacionParciales') ?? '';
+      DateTime actguardadoparcial = DateTime.parse(actparcial);
+      print(actparcial);
+      print(actguardadoparcial);
+
+      if(actualizacionparcial==actguardadoparcial){
+        print("sin actualizar");
+        obtenerParcialesDesdeFirebase();
+      }else{
+        print("vamos a actuializar parciales");
+        await prefs.remove('parcial_list');
+        await prefs.setBool('datos_descargados_parciales', false);
+        await prefs.remove('actualizacionParciales');
+        await prefs.setString("actualizacionParciales", actualizacionparcial.toString()); // Guardamos en shared preferecnes
+        obtenerParcialesDesdeFirebase();
+      }
+
     }
   }
 
