@@ -12,6 +12,10 @@ class Config {
   static const Color whiteColor = Color(0xFFF2F2F2);
   static const Color grayColor = Color(0xFF3C3C3B);
   static const String temaApp = "CALCULO 1";
+  //colores pagina
+  static const Color greenColorParcial = Color(0xFF0DDA0D);
+  static const Color redColorParcial = Color(0xFFFF0000);
+
 
   BoxShadow aplicarSombra(double opacity, double spreadradius, double blur, Offset coordenadas){
     return BoxShadow(
