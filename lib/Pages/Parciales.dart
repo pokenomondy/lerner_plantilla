@@ -5,6 +5,7 @@ import 'package:lerner_plantilla/Utils/expansion_list_diego.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Objetos/Parciales.dart';
+import 'Vistas/VistaContenido.dart';
 
 class Parcialesvista extends StatefulWidget {
   const Parcialesvista({super.key});
@@ -88,7 +89,14 @@ class CuadroParcialesState extends State<CuadroParciales> {
                     universidad: parcial.universidad,
                     subtemario: parcial.subtemas,
                     onTap: () {
-
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => VistaContenido(
+                            contenidos: parcial.contenidos,
+                          ),
+                        ),
+                      );
                     } //Aqui enviar a pestaña del parcial
                     );
               }),
