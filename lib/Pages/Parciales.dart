@@ -19,7 +19,7 @@ class _ParcialesvistaState extends State<Parcialesvista> {
 
   Future obtenerParcialesDesdeFirebase() async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool datosDescargados = prefs.getBool('datos_descargados_parcailes') ?? false;
+    bool datosDescargados = prefs.getBool('datos_descargados_parciales') ?? false;
     if(!datosDescargados){
       CollectionReference referenceParciales = FirebaseFirestore.instance.collection("PARCIALES").doc(Config.temaApp).collection("PARCIALES");
       QuerySnapshot queryParciales = await referenceParciales.get();
@@ -102,125 +102,109 @@ class _CuadroParcialesState extends State<CuadroParciales> {
         height: currentheight-100,
         child: Padding(
           padding: const EdgeInsets.all(0),
-          child: MediaQuery.removePadding(
-            context: context,
-            removeTop: true,
-            removeBottom: true,
-            removeLeft:true,
-            removeRight: true,
-            child: Container(
-              child: ListView.builder(
-                  shrinkWrap: true,
-                  padding: MediaQuery.of(context).padding.copyWith(
-                    left: 0,
-                    right: 0,
-                    bottom: 50,
-                  ),
-                  itemCount: widget.parcialesList.length,
-                  itemBuilder: (context,index){
-                  Parciales parcial = widget.parcialesList[index];
-                  bool isExpanded = index ==  _expandedIndex;
+          child: ListView.builder(
+              shrinkWrap: true,
+              padding: MediaQuery.of(context).padding.copyWith(
+                left: 0,
+                right: 0,
+                bottom: 50,
+              ),
+              itemCount: widget.parcialesList.length,
+              itemBuilder: (context,index){
+                Parciales parcial = widget.parcialesList[index];
+                bool isExpanded = index ==  _expandedIndex;
 
-                  return Column(
-                    children: [
-                      Container(
-                        //decoration: cuadroParcialDiseno(parcial.indicedificultad,isExpanded,"carta principal"),
-                        child:MediaQuery.removePadding(
-                          context: context,
-                          removeTop: true,
-                          removeBottom: true,
-                          removeLeft:true,
-                          removeRight: true,
-                          child: ExpansionTile(
-                            onExpansionChanged: (expanded){
-                              setState(() {
-                                _expandedIndex = expanded ? index : null;
-                              });
-                            },
-                            title: Container(
-                              decoration: cuadroParcialDiseno(parcial.indicedificultad,isExpanded,"carta principal"),
-                              height: 100,
-                              child: Padding(
+                return Column(
+                  children: [
+                    Container(
+                      decoration: cuadroParcialDiseno(parcial.indicedificultad,isExpanded,"carta principal"),
+                      child:ExpansionTile(
+                        onExpansionChanged: (expanded){
+                          setState(() {
+                            _expandedIndex = expanded ? index : null;
+                          });
+                        },
+                        title: Container(
+                          decoration: cuadroParcialDiseno(parcial.indicedificultad,isExpanded,"carta principal"),
+                          height: 100,
+                          child: Padding(
+                              padding: EdgeInsets.zero,
+                              child: Container(
+                                height: 60,
+                                child: Padding(
                                   padding: EdgeInsets.zero,
-                                  child: Container(
-                                    height: 60,
-                                    child: Padding(
-                                      padding: EdgeInsets.zero,
-                                      child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.start,
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(parcial.fraseparcial,style: textocuadros(parcial.indicedificultad,"as")),
-                                              Container(
-                                                  width: 90,
-                                                  decoration: cuadroParcialDiseno(parcial.indicedificultad,isExpanded,"indificultad"),
-                                                  child: Center(
-                                                    child: Text(parcial.indicedificultad,style: textocuadros(parcial.indicedificultad,"indificultad"),
-                                                    ),
-                                                  )),
-                                            ],),
-                                          Text(parcial.universidad),
+                                          Text(parcial.fraseparcial,style: textocuadros(parcial.indicedificultad,"as")),
+                                          Container(
+                                              width: 90,
+                                              decoration: cuadroParcialDiseno(parcial.indicedificultad,isExpanded,"indificultad"),
+                                              child: Center(
+                                                child: Text(parcial.indicedificultad,style: textocuadros(parcial.indicedificultad,"indificultad"),
+                                                ),
+                                              )),
+                                        ],),
+                                      Text(parcial.universidad),
 
-                                        ],
-                                      ),
-                                    ),
-                                  )
-                              ),
-                            ),
-                            children: isExpanded
-                                ? [ ListTileTheme(
-                              child: AnimatedContainer(
-                                duration: Duration(milliseconds: 300),
-                                decoration: cuadrosubtemasdiseno(parcial.indicedificultad), // Personaliza el color como desees
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Container(
-                                      width: currentwidth/2+100,
-                                      height: 180,
-                                      color: Colors.red,
-                                      child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Text('Temas necesarios',style: textocuadros(parcial.indicedificultad, "indificultad"),),
-                                          ListTileTheme(
-                                            child: ListView.builder(
-                                              shrinkWrap: true,
-                                              itemCount: parcial.subtemas.length,
-                                              itemBuilder: (context, subIndex) =>
-                                                  Row(
-                                                    children: [
-                                                      Text(parcial.subtemas[subIndex],style: textocuadros(parcial.indicedificultad, "indificultad"),),
-                                                    ],
-                                                  ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Icon(Icons.add),
-                                      ],
-                                    )
-                                  ],
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            ),]
-                                : [],
+                              )
                           ),
                         ),
+                        children: isExpanded
+                            ? [ ListTileTheme(
+                          child: AnimatedContainer(
+                            duration: Duration(milliseconds: 300),
+                            decoration: cuadrosubtemasdiseno(parcial.indicedificultad), // Personaliza el color como desees
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Container(
+                                  width: currentwidth/2+100,
+                                  height: 180,
+                                  color: Colors.red,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text('Temas necesarios',style: textocuadros(parcial.indicedificultad, "indificultad"),),
+                                      ListTileTheme(
+                                        child: ListView.builder(
+                                          shrinkWrap: true,
+                                          itemCount: parcial.subtemas.length,
+                                          itemBuilder: (context, subIndex) =>
+                                              Row(
+                                                children: [
+                                                  Text(parcial.subtemas[subIndex],style: textocuadros(parcial.indicedificultad, "indificultad"),),
+                                                ],
+                                              ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.add),
+                                  ],
+                                )
+                              ],
+                            ),
+                          ),
+                        ),]
+                            : [],
                       ),
-                    ],
-                  );
+                    ),
+                  ],
+                );
 
-                  }
-                  ),
-            ),
+              }
           ),
         ),
       ),
