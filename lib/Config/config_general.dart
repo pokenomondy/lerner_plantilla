@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:lerner_plantilla/Objetos/Subtemas.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../Objetos/Parciales.dart';
 import '../Objetos/Temas.dart';
@@ -59,5 +60,11 @@ class Config {
     return parcialList;
   }
 
+  Future<List<Map<String, dynamic>>> obtenerDatosBuscador() async {
+    List<Map<String, dynamic>> items = [];
+    obtenerTemasDesdeFirebase().then((value) => items.add({"esSubtema": true, "Content":value}));
+    obtenerParcialesDesdeFirebase().then((value) => items.add({"esSubtema": false, "Content":value}));
+    return items;
+  }
 
 }
