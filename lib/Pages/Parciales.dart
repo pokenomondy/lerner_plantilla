@@ -71,7 +71,7 @@ class _ParcialesvistaState extends State<Parcialesvista> {
                 } else {
                   List<Parciales> parcialesList = snapshot.data;
 
-                  return _CuadroParciales(parcialesList);
+                  return CuadroParciales(parcialesList);
                 }
               }),
         ],
@@ -80,16 +80,16 @@ class _ParcialesvistaState extends State<Parcialesvista> {
   }
 }
 
-class _CuadroParciales extends StatefulWidget {
+class CuadroParciales extends StatefulWidget {
   final List<Parciales> parcialesList;
 
-  const _CuadroParciales(this.parcialesList);
+  const CuadroParciales(this.parcialesList);
 
   @override
-  _CuadroParcialesState createState() => _CuadroParcialesState();
+  CuadroParcialesState createState() => CuadroParcialesState();
 }
 
-class _CuadroParcialesState extends State<_CuadroParciales> {
+class CuadroParcialesState extends State<CuadroParciales> {
 
   @override
   Widget build(BuildContext context) {
