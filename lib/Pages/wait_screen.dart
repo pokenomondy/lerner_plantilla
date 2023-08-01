@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../Config/config_general.dart';
 import '../Objetos/Contenido.dart';
@@ -41,7 +42,12 @@ class _CargarDatosState extends State<_CargarDatos> {
   void initState() {
     super.initState();
     actualizarapp();
-    //a parciales desde firebase no se le va a meter ningun metodo todavia
+    _initGoogleMobileAds;
+  }
+
+  Future<InitializationStatus> _initGoogleMobileAds() {
+    // TODO: Initialize Google Mobile Ads SDK
+    return MobileAds.instance.initialize();
   }
 
   Future actualizarapp() async {
@@ -58,7 +64,6 @@ class _CargarDatosState extends State<_CargarDatos> {
           .collection("PARCIALES").doc(Config.temaApp).get();
       DateTime actualizacionparcial = getactualizacionparcial.get('fecha actualizacion')
           .toDate();
-      print("actparcial $actualizacionparcial");
       //guardo actualizacion temas
       await prefs.setString("actualizacionTemas", actualizacion.toString()); // Guardamos en shared preferecnes
       await prefs.setBool('datos_actualizacion', true);
@@ -73,11 +78,9 @@ class _CargarDatosState extends State<_CargarDatos> {
       String act = prefs.getString('actualizacionTemas') ?? '';
       DateTime actguardado = DateTime.parse(act);
       if (actguardado == actualizacion) {
-        print("sin actualizar");
         obtenerTemasDesdeFirebase();
       } else {
         //eliminar variables para actualizar
-        print("a actualizar");
         await prefs.remove('temas_list');
         await prefs.setBool('datos_descargados_listatemas', false);
         await prefs.remove('actualizacionTemas');
@@ -90,14 +93,10 @@ class _CargarDatosState extends State<_CargarDatos> {
       DateTime actualizacionparcial = getactualizacionparcial.get('fecha actualizacion').toDate();
       String actparcial = prefs.getString('actualizacionParciales') ?? '';
       DateTime actguardadoparcial = DateTime.parse(actparcial);
-      print(actparcial);
-      print(actguardadoparcial);
 
       if(actualizacionparcial==actguardadoparcial){
-        print("sin actualizar");
         obtenerParcialesDesdeFirebase();
       }else{
-        print("vamos a actuializar parciales");
         await prefs.remove('parcial_list');
         await prefs.setBool('datos_descargados_parciales', false);
         await prefs.remove('actualizacionParciales');
@@ -109,12 +108,11 @@ class _CargarDatosState extends State<_CargarDatos> {
   }
 
   Future obtenerTemasDesdeFirebase() async {
-    startprogressindicator();
+    startprogressindicator(_datosdescargados);
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool datosDescargados = prefs.getBool('datos_descargados_listatemas') ??
         false;
     if (!datosDescargados) {
-      print("descargar datos");
       // print("Los datos apenas se van a descargar, priemra vez");
       CollectionReference referenceTemas = FirebaseFirestore.instance
           .collection("MATERIAS").doc(Config.temaApp).collection("TEMAS");
@@ -157,16 +155,12 @@ class _CargarDatosState extends State<_CargarDatos> {
         temasList.add(tema);
         // print("temalist $temasList");
       }
-      setState(() {
-        _datosdescargados = true;
-      });
+      _datosdescargados = true;
+      startprogressindicator(_datosdescargados);
       guardardatos("temas");
       return temasList;
     } else {
-      print('ya descargados los datos, se cargan de sharedpreferences');
-      setState(() {
-        _datosdescargados = true;
-      });
+      _datosdescargados = true;
     }
   }
 
@@ -175,7 +169,6 @@ class _CargarDatosState extends State<_CargarDatos> {
     bool datosDescargados = prefs.getBool('datos_descargados_parciales') ?? false;
     if (!datosDescargados) {
 
-      print('obtengamos parciales');
       CollectionReference referenceParciales = FirebaseFirestore.instance
           .collection("PARCIALES")
           .doc(Config.temaApp)
@@ -203,7 +196,6 @@ class _CargarDatosState extends State<_CargarDatos> {
                 (data['contenido'] as List).cast<Map<String, dynamic>>();
             Contenido contenido = Contenido(contenidoData,);
             contenidos.add(contenido);
-            print("contenido = $contenidoData");
           }
         Parciales newparcial = Parciales(fraseParcial, universidad, materia,
             tema, subtemas, indicedificultad,contenidos);
@@ -213,11 +205,12 @@ class _CargarDatosState extends State<_CargarDatos> {
       guardardatos("parciales");
       return parcialesList;
     }else{
-      print("ya descargados los parciales");
+      _datosdescargados = true;
+      startprogressindicator(_datosdescargados);
     }
   }
 
-  void startprogressindicator() {
+  void startprogressindicator(bool datosdescargados) {
     setState(() {
       isLoading = true;
       progressValue = 0;
@@ -226,33 +219,40 @@ class _CargarDatosState extends State<_CargarDatos> {
     const totalProgressTime = 2; // Tiempo total para llegar al 90%
     const steps = 50; // Cantidad de pasos para el incremento
 
-    final stepDuration = Duration(milliseconds: (totalProgressTime * 1000) ~/ steps);
+    const stepDuration =  Duration(milliseconds: (totalProgressTime * 1000) ~/ steps);
 
     var currentStep = 0;
 
-    Timer.periodic(stepDuration, (timer) {
-      currentStep++;
-      setState(() {
-        progressValue = currentStep / steps * 0.9;
-        progresstext = (progressValue*100).toStringAsFixed(1);
-      });
+    if(datosdescargados==false){
+      Timer.periodic(stepDuration, (timer) {
+        currentStep++;
+        setState(() {
+          progressValue = currentStep / steps * 0.9;
+          progresstext = (progressValue*100).toStringAsFixed(1);
+        });
 
-      if (currentStep == steps) {
-        timer.cancel();
-        if (_datosdescargados) {
-          completeprogress(); // Iniciar el progreso del 90% al 100%
+        if (currentStep == steps) {
+          timer.cancel();
+
         }
+      });
+    }else{
+      if (datosdescargados==true) {
+        completeprogress(); // Iniciar el progreso del 90% al 100%
       }
-    });
+    }
+
+
+
+
+
   }
 
   Future guardardatos(String parcialtema) async{
     if(parcialtema=="parciales"){
-      print("se guardan datos de parciales");
       SharedPreferences prefs = await SharedPreferences.getInstance();
       // print("se guardan datos");
       String temasJson = jsonEncode(parcialesList);
-      print(temasJson);//convertios a Json para guardar
       await prefs.setString('parcial_list', temasJson); // Guardamos en shared preferecnes
       await prefs.setBool('datos_descargados_parciales', true);
     }else{
@@ -268,7 +268,7 @@ class _CargarDatosState extends State<_CargarDatos> {
     const completeDuration = 1000; // Tiempo para completar el 10% restante (desde el 90% hasta el 100%)
     const steps = 10; // Cantidad de pasos para el incremento
 
-    final stepDuration = Duration(milliseconds: (completeDuration ~/ steps));
+    const stepDuration = Duration(milliseconds: (completeDuration ~/ steps));
     var currentStep = 0;
 
     Timer.periodic(stepDuration, (timer) {
@@ -314,14 +314,14 @@ class _CargarDatosState extends State<_CargarDatos> {
         child:  Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _DibujarLogo(),
-            _EscribirFrase(),
-            Container(
+            const _DibujarLogo(),
+            const _EscribirFrase(),
+            SizedBox(
               width: currentwidth-180,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Container(
+                    SizedBox(
                       width: currentwidth-220,
                       child: Column(
                         children: [
@@ -330,7 +330,7 @@ class _CargarDatosState extends State<_CargarDatos> {
                             child: LinearProgressIndicator(
                               value: progressValue,
                               minHeight: 10,
-                              valueColor: AlwaysStoppedAnimation<Color>(Config.primaryColor),
+                              valueColor: const AlwaysStoppedAnimation<Color>(Config.primaryColor),
                             ),
                           ),
                         ],

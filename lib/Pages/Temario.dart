@@ -82,7 +82,6 @@ class _CuadroTemaState extends State<CuadroTema> {
 
   @override
   Widget build(BuildContext context) {
-    final double currentwidth = MediaQuery.of(context).size.width;
     final double currentheight = MediaQuery.of(context).size.height;
 
     return Container(
@@ -108,7 +107,7 @@ class _CuadroTemaState extends State<CuadroTema> {
                   title: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 5,vertical: 2),
                     child: Container(
-                        decoration: CuadroTemaDiseno(isExpanded!),
+                        decoration: CuadroTemaDiseno(isExpanded),
                         height: 90,
                         child: Padding(
                           padding: const EdgeInsets.all(15.0),
