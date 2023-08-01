@@ -31,17 +31,7 @@ class _TemarioState extends State<Temario> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Config.primaryColor,
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.search),
-            onPressed: () {
-              // Aquí puedes agregar la lógica para realizar la búsqueda
-            },
-          ),
-        ],
-      ),
+      appBar: Config().defaultAppBar(),
       body: Column(
         children: [
           FutureBuilder(
