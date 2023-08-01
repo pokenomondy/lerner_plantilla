@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:lerner_plantilla/Pages/Parciales.dart';
 import 'package:lerner_plantilla/Pages/dashboard.dart';
 import 'package:lerner_plantilla/Pages/Temario.dart';
 import 'package:lerner_plantilla/Pages/wait_screen.dart';
@@ -24,6 +25,7 @@ class MyApp extends StatelessWidget {
         '/': (context) => const WaitScreenBuild(),
         '/home': (context) => const Dashboard(),
         '/home/temario': (context) => Temario(),
+        '/home/parciales': (context) => Parcialesvista(),
       }, onUnknownRoute: (RouteSettings settings){
         return MaterialPageRoute(
             builder: (context) => const WaitScreenBuild()

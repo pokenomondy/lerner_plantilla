@@ -19,6 +19,7 @@ class _TemarioState extends State<Temario> {
   final db = FirebaseFirestore.instance; //inicializar firebase
   List<Temas> temasList = [];
 
+
   Future obtenerTemasDesdeFirebase() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String temasJson = prefs.getString('temas_list') ?? '';
