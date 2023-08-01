@@ -17,11 +17,6 @@ class Dashboard extends StatelessWidget {
           children: [
             _CrearBoton(title: "Ver temario", subtitle: "Oprima para ver el temario \ndel area", currentwidth: currentwidth, imageRoute: 'assets/sources/temario.jpg', destinationRoute: '/home/temario',),
             _CrearBoton(title: "Hacer ejercicio", subtitle: "Ejercicios para prepararte \npara tus examenes", currentwidth: currentwidth, imageRoute: 'assets/sources/temario.jpg', destinationRoute: '/home/parciales',),
-        ElevatedButton(onPressed: (){
-          Navigator.pushNamed(context, '/');
-
-        }
-            , child: const Text(' a pantalla de carga')),
           ],
         ),
       ),
