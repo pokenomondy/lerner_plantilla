@@ -14,38 +14,8 @@ class Parcialesvista extends StatefulWidget {
 }
 
 class _ParcialesvistaState extends State<Parcialesvista> {
-
   List<Parciales> parcialesList = [];
-
-  Future obtenerParcialesDesdeFirebase() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool datosDescargados =
-        prefs.getBool('datos_descargados_parcailes') ?? false;
-    if (!datosDescargados) {
-      CollectionReference referenceParciales = FirebaseFirestore.instance
-          .collection("PARCIALES")
-          .doc(Config.temaApp)
-          .collection("PARCIALES");
-      QuerySnapshot queryParciales = await referenceParciales.get();
-
-      for (var parcialDoc in queryParciales.docs) {
-        String fraseParcial = parcialDoc['fraseparcial'];
-        String universidad = parcialDoc['universidad'];
-        String materia = parcialDoc['materia'];
-        List<dynamic> temaDynamic = parcialDoc['tema'];
-        List<dynamic> subtemasDynamic = parcialDoc['subtemas'];
-        List<String> tema = temaDynamic.cast<String>();
-        List<String> subtemas = subtemasDynamic.cast<String>();
-        String indicedificultad = parcialDoc['indicedificultad'];
-
-        Parciales newparcial = Parciales(fraseParcial, universidad, materia,
-            tema, subtemas, indicedificultad);
-        parcialesList.add(newparcial);
-      }
-
-      return parcialesList;
-    }
-  }
+  Config config = Config();
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +25,7 @@ class _ParcialesvistaState extends State<Parcialesvista> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           FutureBuilder(
-              future: obtenerParcialesDesdeFirebase(),
+              future: config.obtenerParcialesDesdeFirebase(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   // Mientras se espera, mostrar un mensaje de carga

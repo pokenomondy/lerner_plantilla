@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../Objetos/Parciales.dart';
 import '../Objetos/Temas.dart';
 import '../Utils/search.dart';
 
@@ -46,6 +47,16 @@ class Config {
     List<dynamic> temasData = jsonDecode(temasJson);
     List temasList = temasData.map((temaData) => Temas.fromJson(temaData)).toList();
     return temasList;
+  }
+
+  Future obtenerParcialesDesdeFirebase() async {
+    print("obteniendo parciales");
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String temasJson = prefs.getString('parcial_list') ?? '';
+    List<dynamic> temasData = jsonDecode(temasJson);
+    List parcialList = temasData.map((temasData) => Parciales.fromJson(temasData)).toList();
+    print("lista de parciales $parcialList");
+    return parcialList;
   }
 
 
