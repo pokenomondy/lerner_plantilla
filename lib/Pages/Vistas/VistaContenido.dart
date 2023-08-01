@@ -3,10 +3,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart' hide Text;
 import 'package:flutter_quill_extensions/embeds/builders.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:intl/intl.dart';
+import 'package:lerner_plantilla/Config/AdHelper.dart';
 import '../../Objetos/Contenido.dart';
 import '../../Widgets/FirebaseImageWidget.dart';
 import '../../Widgets/LatexEmbedBuilder.dart';
+
+
+
 
 
 class VistaContenido extends StatefulWidget {
@@ -21,15 +26,19 @@ class VistaContenido extends StatefulWidget {
 class _VistaContenidoState extends State<VistaContenido> {
   QuillController _controller = QuillController.basic();
   List<Map<String, dynamic>> contenidoData = [];
-
+  InterstitialAd? _interstitialAd;
 
 
   @override
   void initState() {
     super.initState();
-    cargarcontenido();
+    //cargarcontenido();
+    _loadInterstitialAd();
+    _showInterstitialAd();
   }
 
+
+  /*
   Future<void> cargarcontenido() async {
 
     final contenido = widget.contenidos[0].contenido;
@@ -42,6 +51,38 @@ class _VistaContenidoState extends State<VistaContenido> {
 
   }
 
+   */
+
+  void _loadInterstitialAd(){
+    InterstitialAd.load(
+        adUnitId: AdHelper.interstitialAdUnitId,
+        request: AdRequest(),
+        adLoadCallback: InterstitialAdLoadCallback(
+            onAdLoaded: (ad){
+              ad.fullScreenContentCallback = FullScreenContentCallback(
+                onAdDismissedFullScreenContent: (ad){
+                  print("aqui solo deberia mostrar normalmente la app");
+                }
+              );
+              setState(() {
+                _interstitialAd = ad;
+                _showInterstitialAd();
+              });
+            },
+            onAdFailedToLoad: (err){
+              print('Failed to load an interstitial ad: ${err.message}');
+            }
+        ),
+    );
+  }
+
+  void _showInterstitialAd() {
+    if (_interstitialAd != null) {
+      _interstitialAd!.show();
+    } else {
+      print("El anuncio intersticial no está disponible para mostrar.");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
