@@ -7,7 +7,6 @@ import '../Pages/Vistas/VistaContenido.dart';
 class SearchDelegateSubtemas extends SearchDelegate {
   late List<Temas> temario;
   late List<Map<String, dynamic>> items;
-  late int selectedOpcion = 1;
 
   @override
   ThemeData appBarTheme(BuildContext context) {
@@ -80,7 +79,7 @@ class SearchDelegateSubtemas extends SearchDelegate {
     List<dynamic> itemsBuscados = [];
 
     for (int recorrer = 0; recorrer < items.length; recorrer++) {
-      if (items[recorrer]['esSubtema'] && (selectedOpcion == 2 || selectedOpcion == 1)) {
+      if (items[recorrer]['esSubtema']) {
         temario = items[recorrer]['Content'];
         for (int index = 0; index < temario.length; index++) {
           if (temario[index].subtemas.isNotEmpty) {
@@ -97,7 +96,7 @@ class SearchDelegateSubtemas extends SearchDelegate {
             }
           }
         }
-      } else if(!items[recorrer]['esSubtema'] && (selectedOpcion == 3 || selectedOpcion == 1)){
+      } else if(!items[recorrer]['esSubtema']){
         List<Parciales> parciales = items[recorrer]['Content'];
         for (int index = 0; index < parciales.length; index++) {
           if (parciales[index]
@@ -123,45 +122,7 @@ class SearchDelegateSubtemas extends SearchDelegate {
     });
 
     if (itemsBuscados.isNotEmpty) {
-      return Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 22, bottom: 10),
-            child: Row(
-              children: [
-                _OpcionesFiltrado(titulo: "Todos", isPressed: selectedOpcion == 1, onTap: (){
-                  selectedOpcion = 1;
-                  query = query;
-                  showResults(context);
-                }),
-                _OpcionesFiltrado(titulo: "Temas", isPressed: selectedOpcion == 2, onTap: (){
-                  if(selectedOpcion == 2){
-                    selectedOpcion = 1;
-                    query = query;
-                    showResults(context);
-                  }else{
-                    selectedOpcion = 2;
-                    query = query;
-                    showResults(context);
-                  }
-                }),
-                _OpcionesFiltrado(titulo: "Parciales", isPressed: selectedOpcion == 3, onTap: (){
-                  if(selectedOpcion == 3){
-                    selectedOpcion = 1;
-                    query = query;
-                    showResults(context);
-                  }else{
-                    selectedOpcion = 3;
-                    query = query;
-                    showResults(context);
-                  }
-                })
-              ],
-            ),
-          ),
-          Expanded(child: _TarjetasDeBusqueda(items: itemsBuscados))
-        ],
-      );
+      return _TarjetasDeBusqueda(items: itemsBuscados);
     } else {
       return const _NoEncontrada();
     }
@@ -169,150 +130,75 @@ class SearchDelegateSubtemas extends SearchDelegate {
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    return Column(
-      children: [
-        Padding(
-            padding: const EdgeInsets.only(top: 22, bottom: 10),
-            child: Row(
-              children: [
-                  _OpcionesFiltrado(titulo: "Todos", isPressed: selectedOpcion == 1, onTap: (){
-                    selectedOpcion = 1;
-                    showResults(context);
-                  }),
-                  _OpcionesFiltrado(titulo: "Temas", isPressed: selectedOpcion == 2, onTap: (){
-                    if(selectedOpcion == 2){
-                      selectedOpcion = 1;
-                      showResults(context);
-                    }else{
-                      selectedOpcion = 2;
-                      showResults(context);
-                    }
-                  }),
-                _OpcionesFiltrado(titulo: "Parciales", isPressed: selectedOpcion == 3, onTap: (){
-                  if(selectedOpcion == 3){
-                    selectedOpcion = 1;
-                    showResults(context);
-                  }else{
-                    selectedOpcion = 3;
-                    showResults(context);
-                  }
-                })
-              ],
+    return FutureBuilder(
+      future: Config().obtenerDatosBuscador(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: CircularProgressIndicator(
+              strokeWidth: 4,
             ),
-        ),
-        Expanded(
-            child: FutureBuilder(
-              future: Config().obtenerDatosBuscador(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
-                    child: CircularProgressIndicator(
-                      strokeWidth: 4,
-                    ),
-                  );
-                } else if (snapshot.hasError) {
-                  return Text("Ups! Ha ocurrido un error",
-                      style: Config().aplicarEstilo(Config.secondColor, 20, true));
-                } else {
-                  items = snapshot.data!;
-                }
+          );
+        } else if (snapshot.hasError) {
+          return Text("Ups! Ha ocurrido un error",
+              style: Config().aplicarEstilo(Config.secondColor, 20, true));
+        } else {
+          items = snapshot.data!;
+        }
 
-                List<dynamic> itemsBuscados = [];
+        List<dynamic> itemsBuscados = [];
 
-                for (int recorrer = 0; recorrer < items.length; recorrer++) {
-                  if (items[recorrer]['esSubtema'] && (selectedOpcion == 2 || selectedOpcion == 1)) {
-                    temario = items[recorrer]['Content'];
-                    for (int index = 0; index < temario.length; index++) {
-                      if (temario[index].subtemas.isNotEmpty) {
-                        for (int subindex = 0;
-                        subindex < temario[index].subtemas.length;
-                        subindex++) {
-                          if (temario[index]
-                              .subtemas[subindex]
-                              .nombreSubTema
-                              .toLowerCase()
-                              .contains(query.toLowerCase())) {
-                            itemsBuscados.add(temario[index].subtemas[subindex]);
-                          }
-                        }
-                      }
-                    }
-                  } else if(!items[recorrer]['esSubtema'] && (selectedOpcion == 3 || selectedOpcion == 1)){
-                    List<Parciales> parciales = items[recorrer]['Content'];
-                    for (int index = 0; index < parciales.length; index++) {
-                      if (parciales[index]
-                          .fraseparcial
-                          .toLowerCase()
-                          .contains(query.toLowerCase())) {
-                        itemsBuscados.add(parciales[index]);
-                      }
-                    }
+        for (int recorrer = 0; recorrer < items.length; recorrer++) {
+          if (items[recorrer]['esSubtema']) {
+            temario = items[recorrer]['Content'];
+            for (int index = 0; index < temario.length; index++) {
+              if (temario[index].subtemas.isNotEmpty) {
+                for (int subindex = 0;
+                subindex < temario[index].subtemas.length;
+                subindex++) {
+                  if (temario[index]
+                      .subtemas[subindex]
+                      .nombreSubTema
+                      .toLowerCase()
+                      .contains(query.toLowerCase())) {
+                    itemsBuscados.add(temario[index].subtemas[subindex]);
                   }
                 }
+              }
+            }
+          } else if(!items[recorrer]['esSubtema']){
+            List<Parciales> parciales = items[recorrer]['Content'];
+            for (int index = 0; index < parciales.length; index++) {
+              if (parciales[index]
+                  .fraseparcial
+                  .toLowerCase()
+                  .contains(query.toLowerCase())) {
+                itemsBuscados.add(parciales[index]);
+              }
+            }
+          }
+        }
 
-                itemsBuscados.sort((a,b){
-                  if(a.runtimeType.toString() == "SubTemas" && b.runtimeType.toString() == "SubTemas"){
-                    return a.nombreSubTema.toLowerCase().compareTo(b.nombreSubTema.toLowerCase());
-                  }else if(a.runtimeType.toString() == "SubTemas" && b.runtimeType.toString() == "Parciales"){
-                    return a.nombreSubTema.toLowerCase().compareTo(b.fraseparcial.toLowerCase());
-                  } else if(a.runtimeType.toString() == "Parciales" && b.runtimeType.toString() == "SubTemas"){
-                    return a.fraseparcial.toLowerCase().compareTo(b.nombreSubTema.toLowerCase());
-                  } else{
-                    return a.fraseparcial.toLowerCase().compareTo(b.fraseparcial.toLowerCase());
-                  }
-                });
+        itemsBuscados.sort((a,b){
+          if(a.runtimeType.toString() == "SubTemas" && b.runtimeType.toString() == "SubTemas"){
+            return a.nombreSubTema.toLowerCase().compareTo(b.nombreSubTema.toLowerCase());
+          }else if(a.runtimeType.toString() == "SubTemas" && b.runtimeType.toString() == "Parciales"){
+            return a.nombreSubTema.toLowerCase().compareTo(b.fraseparcial.toLowerCase());
+          } else if(a.runtimeType.toString() == "Parciales" && b.runtimeType.toString() == "SubTemas"){
+            return a.fraseparcial.toLowerCase().compareTo(b.nombreSubTema.toLowerCase());
+          } else{
+            return a.fraseparcial.toLowerCase().compareTo(b.fraseparcial.toLowerCase());
+          }
+        });
 
-
-                if (itemsBuscados.isNotEmpty) {
-                  return _TarjetasDeBusqueda(items: itemsBuscados);
-                } else {
-                  return const _NoEncontrada();
-                }
-              },
-            ))
-      ],
+        if (itemsBuscados.isNotEmpty) {
+          return _TarjetasDeBusqueda(items: itemsBuscados);
+        } else {
+          return const _NoEncontrada();
+        }
+      },
     );
   }
-}
-
-class _OpcionesFiltrado extends StatefulWidget{
-
-  final String titulo;
-  final bool isPressed;
-  final VoidCallback onTap;
-
-  const _OpcionesFiltrado({
-    Key?key,
-    required this.titulo,
-    required this.isPressed,
-    required this.onTap
-  }):super(key:key);
-
-  @override
-  _OpcionesFiltradoState createState() => _OpcionesFiltradoState();
-
-}
-
-class _OpcionesFiltradoState extends State<_OpcionesFiltrado>{
-
-  @override
-  Widget build(BuildContext context){
-    return Padding(
-      padding: const EdgeInsets.only(left: 13),
-      child: GestureDetector(
-        onTap: widget.onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-          decoration: BoxDecoration(
-              color: widget.isPressed? Config.secondColor : Config.grayColor.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(20)
-          ),
-          child: Text(widget.titulo, style: Config().aplicarEstilo(widget.isPressed? Colors.white : Config.grayColor, 14, true),),
-        ),
-      ),
-    );
-  }
-
 }
 
 class _NoEncontrada extends StatelessWidget {
@@ -366,7 +252,13 @@ class _TarjetasDeBusquedaState extends State<_TarjetasDeBusqueda> {
             return _AgregarParcial(
                 tittleParcial: widget.items[index].fraseparcial,
                 dificultad: widget.items[index].indicedificultad,
-                onTap: () {});
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => VistaContenido(
+                              contenidos: widget.items[index].contenidos)));
+                });
           }
         });
   }
