@@ -7,6 +7,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:intl/intl.dart';
 import 'package:lerner_plantilla/Config/AdHelper.dart';
 import 'package:lerner_plantilla/Config/config_general.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../Objetos/Contenido.dart';
 import '../../Widgets/FirebaseImageWidget.dart';
 import '../../Widgets/LatexEmbedBuilder.dart';
@@ -34,23 +35,45 @@ class _VistaContenidoState extends State<VistaContenido> {
   void initState() {
     super.initState();
     cargarcontenido();
-    _loadInterstitialAd();
+    _salepublicidad();
   }
 
+  Future<void> _salepublicidad() async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool datosDescargados = prefs.getBool('num_ads') ?? false;
+    if (!datosDescargados) {
+      await prefs.setInt('num_adsint',1 ); // Guardamos en shared preferecnes
+      await prefs.setBool('num_ads', true);
+      print("primera entrada");
+    }else{
+      int? numads = prefs.getInt('num_adsint');
+      print("numero entreda $numads");
+      if(numads! < 3){
+        int numnuevo = numads+1;
+        await prefs.setInt('num_adsint',numnuevo ); // Guardamos en shared preferecnes
+        print("segunda entrada");
+      }else if(numads==3){
+        _loadInterstitialAd();
+        await prefs.remove('num_adsint');
+        await prefs.setBool('num_ads', false);
+        print("tercera entrada");
+      }else{
+        //por si pasa algo, aqui se reinicia
+        _loadInterstitialAd();
+        await prefs.remove('num_adsint');
+        await prefs.setBool('num_ads', false);
+        print("tercera entrada");
+      }
+    }
+    }
 
   Future<void> cargarcontenido() async {
-
     final contenido = widget.contenidos[0].contenido;
     print("pruebas contenido putamadre");
     print(contenido);
     final delta = Delta.fromJson(contenido as List);
     _controller.compose(delta, TextSelection.collapsed(offset: 0), ChangeSource.LOCAL);
-
-
-
   }
-
-
 
   void _loadInterstitialAd(){
     InterstitialAd.load(

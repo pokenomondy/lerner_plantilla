@@ -111,8 +111,7 @@ class _CargarDatosState extends State<_CargarDatos> {
   Future obtenerTemasDesdeFirebase() async {
     startprogressindicator(_datosdescargados);
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool datosDescargados = prefs.getBool('datos_descargados_listatemas') ??
-        false;
+    bool datosDescargados = prefs.getBool('datos_descargados_listatemas') ?? false;
     if (!datosDescargados) {
       print("descargando datos de cero");
       // print("Los datos apenas se van a descargar, priemra vez");
