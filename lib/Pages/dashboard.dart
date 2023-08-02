@@ -16,7 +16,7 @@ class Dashboard extends StatelessWidget {
         child: Column(
           children: [
             _CrearBoton(title: "Ver temario", subtitle: "Oprima para ver el temario \ndel area", currentwidth: currentwidth, imageRoute: 'assets/sources/temario.jpg', destinationRoute: '/home/temario',),
-            _CrearBoton(title: "Hacer ejercicio", subtitle: "Ejercicios para prepararte \npara tus examenes", currentwidth: currentwidth, imageRoute: 'assets/sources/temario.jpg', destinationRoute: '/home/parciales',),
+            _CrearBoton(title: "Banco de parciales", subtitle: "Ejercicios para prepararte \npara tus examenes", currentwidth: currentwidth, imageRoute: 'assets/sources/temario.jpg', destinationRoute: '/home/parciales',),
           ],
         ),
       ),
