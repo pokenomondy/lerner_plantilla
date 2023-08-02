@@ -91,6 +91,7 @@ class CuadroParcialesState extends State<CuadroParciales> {
                         MaterialPageRoute(
                           builder: (context) => VistaContenido(
                             contenidos: parcial.contenidos,
+                            titulo: parcial.fraseparcial,
                           ),
                         ),
                       );
