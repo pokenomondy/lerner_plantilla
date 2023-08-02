@@ -77,6 +77,7 @@ class SearchDelegateSubtemas extends SearchDelegate {
   @override
   Widget buildResults(BuildContext context) {
     List<dynamic> itemsBuscados = [];
+    List<int> indexItems = [];
 
     for (int recorrer = 0; recorrer < items.length; recorrer++) {
       if (items[recorrer]['esSubtema']) {
@@ -92,6 +93,7 @@ class SearchDelegateSubtemas extends SearchDelegate {
                   .toLowerCase()
                   .contains(query.toLowerCase())) {
                 itemsBuscados.add(temario[index].subtemas[subindex]);
+                indexItems.add(index+1);
               }
             }
           }
@@ -104,6 +106,7 @@ class SearchDelegateSubtemas extends SearchDelegate {
               .toLowerCase()
               .contains(query.toLowerCase())) {
             itemsBuscados.add(parciales[index]);
+            indexItems.add(index+1);
           }
         }
       }
@@ -122,7 +125,7 @@ class SearchDelegateSubtemas extends SearchDelegate {
     });
 
     if (itemsBuscados.isNotEmpty) {
-      return _TarjetasDeBusqueda(items: itemsBuscados);
+      return _TarjetasDeBusqueda(items: itemsBuscados, itemsIndex: indexItems,);
     } else {
       return const _NoEncontrada();
     }
@@ -147,6 +150,7 @@ class SearchDelegateSubtemas extends SearchDelegate {
         }
 
         List<dynamic> itemsBuscados = [];
+        List<int> indexItems = [];
 
         for (int recorrer = 0; recorrer < items.length; recorrer++) {
           if (items[recorrer]['esSubtema']) {
@@ -162,6 +166,7 @@ class SearchDelegateSubtemas extends SearchDelegate {
                       .toLowerCase()
                       .contains(query.toLowerCase())) {
                     itemsBuscados.add(temario[index].subtemas[subindex]);
+                    indexItems.add(index+1);
                   }
                 }
               }
@@ -174,6 +179,7 @@ class SearchDelegateSubtemas extends SearchDelegate {
                   .toLowerCase()
                   .contains(query.toLowerCase())) {
                 itemsBuscados.add(parciales[index]);
+                indexItems.add(index+1);
               }
             }
           }
@@ -192,7 +198,7 @@ class SearchDelegateSubtemas extends SearchDelegate {
         });
 
         if (itemsBuscados.isNotEmpty) {
-          return _TarjetasDeBusqueda(items: itemsBuscados);
+          return _TarjetasDeBusqueda(items: itemsBuscados, itemsIndex: indexItems,);
         } else {
           return const _NoEncontrada();
         }
@@ -219,10 +225,12 @@ class _NoEncontrada extends StatelessWidget {
 
 class _TarjetasDeBusqueda extends StatefulWidget {
   final List<dynamic> items;
+  final List<int> itemsIndex;
 
   const _TarjetasDeBusqueda({
     Key? key,
     required this.items,
+    required this.itemsIndex,
   }) : super(key: key);
 
   @override
@@ -247,7 +255,7 @@ class _TarjetasDeBusquedaState extends State<_TarjetasDeBusqueda> {
                         builder: (context) => VistaContenido(
                             contenidos: widget.items[index].contenidos,
                         //aqui toca meter el numero del tema;
-                        titulo: '${widget.items[index].ordenSubtema}. ${widget.items[index].nombreSubTema}',)));
+                        titulo: '${widget.itemsIndex[index]}.${widget.items[index].ordenSubtema}. ${widget.items[index].nombreSubTema}',)));
               },
             );
           } else {

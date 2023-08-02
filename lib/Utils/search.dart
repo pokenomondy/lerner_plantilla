@@ -28,7 +28,7 @@ class SearchBuildState extends State<SearchBuild> {
           children: [
             Padding(
               padding: const EdgeInsets.only(left: 30, bottom: 15, top: 15),
-              child: Text("Buscador aqui..",
+              child: Text("Lernen: Aprende ${Config.temaApp.toLowerCase()}",
                   style: Config().aplicarEstilo(Colors.white, 18, true)
               ),
             ),
