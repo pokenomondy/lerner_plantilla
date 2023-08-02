@@ -56,9 +56,6 @@ class _TemarioState extends State<Temario> {
 
 }
 
-
-
-
 class CuadroTema extends StatefulWidget {
   final List<Temas> temaslist;
 
@@ -136,6 +133,7 @@ class _CuadroTemaState extends State<CuadroTema> {
                           MaterialPageRoute(
                             builder: (context) => VistaContenido(
                               contenidos: subtema.contenidos,
+                              titulo: '${tema.ordentema}.${subtema.ordenSubtema} ${subtema.nombreSubTema}',
                             ),
                           ),
                         );

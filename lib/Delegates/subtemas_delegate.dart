@@ -245,7 +245,9 @@ class _TarjetasDeBusquedaState extends State<_TarjetasDeBusqueda> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => VistaContenido(
-                            contenidos: widget.items[index].contenidos)));
+                            contenidos: widget.items[index].contenidos,
+                        //aqui toca meter el numero del tema;
+                        titulo: '${widget.items[index].ordenSubtema}. ${widget.items[index].nombreSubTema}',)));
               },
             );
           } else {
@@ -257,7 +259,8 @@ class _TarjetasDeBusquedaState extends State<_TarjetasDeBusqueda> {
                       context,
                       MaterialPageRoute(
                           builder: (context) => VistaContenido(
-                              contenidos: widget.items[index].contenidos)));
+                              contenidos: widget.items[index].contenidos,
+                          titulo: widget.items[index].fraseparcial,)));
                 });
           }
         });

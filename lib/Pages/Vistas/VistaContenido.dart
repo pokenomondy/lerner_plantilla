@@ -6,6 +6,7 @@ import 'package:flutter_quill_extensions/embeds/builders.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:intl/intl.dart';
 import 'package:lerner_plantilla/Config/AdHelper.dart';
+import 'package:lerner_plantilla/Config/config_general.dart';
 import '../../Objetos/Contenido.dart';
 import '../../Widgets/FirebaseImageWidget.dart';
 import '../../Widgets/LatexEmbedBuilder.dart';
@@ -13,8 +14,9 @@ import '../../Widgets/LatexEmbedBuilder.dart';
 
 class VistaContenido extends StatefulWidget {
   final List<Contenido> contenidos;
+  final String titulo;
 
-  VistaContenido({required this.contenidos});
+  VistaContenido({required this.contenidos,required this.titulo});
 
   @override
   _VistaContenidoState createState() => _VistaContenidoState();
@@ -86,18 +88,22 @@ class _VistaContenidoState extends State<VistaContenido> {
     final double currentheight = MediaQuery.of(context).size.height;
 
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Config.primaryColor,
+        title: Text(widget.titulo),
+      ),
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.only(left: 30,right: 30,bottom: 0,top: 40),
+            padding: const EdgeInsets.only(left: 20,right: 20,bottom: 0,top: 4),
             child: Container(
-              height: currentheight-40,
+              height: currentheight-100,
               child: QuillEditor(
                 expands: true,
                 scrollController: _scrollController,
                 focusNode: _focusNode,
                 scrollable: true,
-                padding: EdgeInsets.all(5),
+                padding: EdgeInsets.all(0),
                 controller: _controller,
                 autoFocus: false,
                 readOnly: true,
