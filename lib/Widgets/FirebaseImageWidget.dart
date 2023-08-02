@@ -59,10 +59,15 @@ class _FirebaseImageWidgetState extends State<FirebaseImageWidget> {
   @override
   Widget build(BuildContext context) {
     return _imageBytes != null
-        ? Image.memory(
+        ? InteractiveViewer(
+      scaleEnabled: true, // Habilita el zoom
+      maxScale: 3.0, // Establece el zoom máximo
+      minScale: 0.5,
+      child: Image.memory(
       _imageBytes!,
       fit: BoxFit.cover,
-    )
+    ),
+        )
         : CircularProgressIndicator();
   }
 }
