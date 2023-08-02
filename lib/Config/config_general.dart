@@ -43,10 +43,12 @@ class Config {
   }
 
   Future obtenerTemasDesdeFirebase() async {
+    print("llamando teme list");
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String temasJson = prefs.getString('temas_list') ?? '';
     List<dynamic> temasData = jsonDecode(temasJson);
     List temasList = temasData.map((temaData) => Temas.fromJson(temaData)).toList();
+    print("talist $temasList");
     return temasList;
   }
 

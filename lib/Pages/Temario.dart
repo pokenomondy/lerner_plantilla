@@ -18,15 +18,8 @@ class _TemarioState extends State<Temario> {
   //variables
   final db = FirebaseFirestore.instance; //inicializar firebase
   List<Temas> temasList = [];
+  Config config = Config();
 
-
-  Future obtenerTemasDesdeFirebase() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String temasJson = prefs.getString('temas_list') ?? '';
-    List<dynamic> temasData = jsonDecode(temasJson);
-    List temasList = temasData.map((temaData) => Temas.fromJson(temaData)).toList();
-    return temasList;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +28,7 @@ class _TemarioState extends State<Temario> {
       body: Column(
         children: [
           FutureBuilder(
-              future: obtenerTemasDesdeFirebase(),
+              future: config.obtenerTemasDesdeFirebase(),
               builder: (context,snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   // Mientras se espera, mostrar un mensaje de carga
@@ -127,7 +120,6 @@ class _CuadroTemaState extends State<CuadroTema> {
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text('Texto careverga de Diego'),
                                   ],
                                 ),
                               )
@@ -172,7 +164,7 @@ class _CuadroTemaState extends State<CuadroTema> {
                                           textotituloSubTema("${tema.ordentema}.${subtema.ordenSubtema}.${subtema.nombreSubTema}"),
                                           Container(
                                             margin: EdgeInsets.only(top: 4),
-                                            child: textotituloSubTema('## documentos'),)
+                                            child: textotituloSubTema(''),)
                                         ],
                                       ),
                                       Icon(Icons.not_started,color: Config.whiteColor, size: 40,)
@@ -210,6 +202,12 @@ class _CuadroTemaState extends State<CuadroTema> {
 
   CuadroTemaDiseno(bool isExpanded) {
     return BoxDecoration(
+      boxShadow: [BoxShadow(
+          color: Config.grayColor.withOpacity(0.1),
+          spreadRadius: 3,
+          blurRadius: 7,
+          offset: const Offset(0, 4),
+      )],
       color: Config.whiteColor,
       borderRadius: BorderRadius.circular(20.0),
       border: isExpanded ? Border.all(color: Config.primaryColor, width: 2.0) : Border(),
@@ -219,6 +217,12 @@ class _CuadroTemaState extends State<CuadroTema> {
 
   CuadroSubTemaDiseno() {
     return BoxDecoration(
+      boxShadow: [BoxShadow(
+        color: Config.grayColor.withOpacity(0.1),
+        spreadRadius: 3,
+        blurRadius: 7,
+        offset: const Offset(0, 4),
+      )],
       color: Config.primaryColor,
       borderRadius: BorderRadius.circular(12.0),
 

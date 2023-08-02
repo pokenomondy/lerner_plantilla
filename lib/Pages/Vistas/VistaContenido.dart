@@ -11,9 +11,6 @@ import '../../Widgets/FirebaseImageWidget.dart';
 import '../../Widgets/LatexEmbedBuilder.dart';
 
 
-
-
-
 class VistaContenido extends StatefulWidget {
   final List<Contenido> contenidos;
 
@@ -27,18 +24,18 @@ class _VistaContenidoState extends State<VistaContenido> {
   QuillController _controller = QuillController.basic();
   List<Map<String, dynamic>> contenidoData = [];
   InterstitialAd? _interstitialAd;
+  final FocusNode _focusNode = FocusNode();
+  final ScrollController _scrollController = ScrollController();
 
 
   @override
   void initState() {
     super.initState();
-    //cargarcontenido();
+    cargarcontenido();
     _loadInterstitialAd();
-    _showInterstitialAd();
   }
 
 
-  /*
   Future<void> cargarcontenido() async {
 
     final contenido = widget.contenidos[0].contenido;
@@ -51,7 +48,7 @@ class _VistaContenidoState extends State<VistaContenido> {
 
   }
 
-   */
+
 
   void _loadInterstitialAd(){
     InterstitialAd.load(
@@ -86,19 +83,30 @@ class _VistaContenidoState extends State<VistaContenido> {
 
   @override
   Widget build(BuildContext context) {
+    final double currentheight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(60.0),
-            child: QuillEditor.basic(
-              controller: _controller,
-              readOnly: true,
-              embedBuilders: [
-                FirebaseImageEmbedBuilder(),
-                VideoEmbedBuilder(),
-                LatexEmbedBuilder(),
-              ],
+            padding: const EdgeInsets.only(left: 30,right: 30,bottom: 0,top: 40),
+            child: Container(
+              height: currentheight-40,
+              child: QuillEditor(
+                expands: true,
+                scrollController: _scrollController,
+                focusNode: _focusNode,
+                scrollable: true,
+                padding: EdgeInsets.all(5),
+                controller: _controller,
+                autoFocus: false,
+                readOnly: true,
+                embedBuilders: [
+                  FirebaseImageEmbedBuilder(),
+                  VideoEmbedBuilder(),
+                  LatexEmbedBuilder(),
+                ],
+              ),
             ),
           ),
         ],

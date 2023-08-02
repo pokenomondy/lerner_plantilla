@@ -78,14 +78,15 @@ class _CargarDatosState extends State<_CargarDatos> {
       String act = prefs.getString('actualizacionTemas') ?? '';
       DateTime actguardado = DateTime.parse(act);
       if (actguardado == actualizacion) {
+        print("no descargando temas");
         obtenerTemasDesdeFirebase();
       } else {
+        print("descargar nuevos temas");
         //eliminar variables para actualizar
         await prefs.remove('temas_list');
         await prefs.setBool('datos_descargados_listatemas', false);
         await prefs.remove('actualizacionTemas');
-        await prefs.setString("actualizacionTemas",
-            actualizacion.toString()); // Guardamos en shared preferecnes
+        await prefs.setString("actualizacionTemas", actualizacion.toString()); // Guardamos en shared preferecnes
         obtenerTemasDesdeFirebase();
       }
       //parciales
@@ -113,6 +114,7 @@ class _CargarDatosState extends State<_CargarDatos> {
     bool datosDescargados = prefs.getBool('datos_descargados_listatemas') ??
         false;
     if (!datosDescargados) {
+      print("descargando datos de cero");
       // print("Los datos apenas se van a descargar, priemra vez");
       CollectionReference referenceTemas = FirebaseFirestore.instance
           .collection("MATERIAS").doc(Config.temaApp).collection("TEMAS");
@@ -121,7 +123,7 @@ class _CargarDatosState extends State<_CargarDatos> {
       for (var temaDoc in queryTemas.docs) {
         String nombreTema = temaDoc['nombre Tema'];
         int ordenTema = temaDoc['Orden tema'];
-        // print("$ordenTema $nombreTema");
+         print("$ordenTema $nombreTema");
 
         //Ahora metemos subtemas para crear la lista y guardar
         QuerySnapshot subtemasDocs = await temaDoc.reference.collection(
@@ -130,7 +132,7 @@ class _CargarDatosState extends State<_CargarDatos> {
         for (var subtemaDoc in subtemasDocs.docs) {
           String nombreSubTema = subtemaDoc['nombreSubTema']; // Suponiendo que 'nombreSubTema' es el campo que contiene el nombre del subtema
           int ordenSubtema = subtemaDoc['ordenSubtema'];
-          // print("$ordenSubtema $nombreSubTema");
+           print("$ordenSubtema $nombreSubTema");
 
           //Ahora cargamos el contenido
           QuerySnapshot contenidoDocs = await subtemaDoc.reference.collection(
@@ -144,7 +146,7 @@ class _CargarDatosState extends State<_CargarDatos> {
                 (data['contenido'] as List).cast<Map<String, dynamic>>();
             Contenido contenido = Contenido(contenidoData,);
             contenidos.add(contenido);
-            // print("contenido = $contenidoData");
+             print("contenido = $contenidoData");
           }
           //guaramos subtemas
           SubTemas subtema = SubTemas(nombreSubTema, ordenSubtema, contenidos);
@@ -153,14 +155,23 @@ class _CargarDatosState extends State<_CargarDatos> {
 
         Temas tema = Temas(nombreTema, ordenTema, subtemasList);
         temasList.add(tema);
-        // print("temalist $temasList");
       }
-      _datosdescargados = true;
+
+      setState(() {
+        _datosdescargados = true;
+      });
+
+      print("a guardar temas parece");
+      guardardatos("guardando temas");
       startprogressindicator(_datosdescargados);
-      guardardatos("temas");
+
       return temasList;
     } else {
-      _datosdescargados = true;
+      print("temas ya en sharedpreferences");
+      setState(() {
+        _datosdescargados = true;
+        startprogressindicator(datosDescargados);
+      });
     }
   }
 
@@ -201,12 +212,10 @@ class _CargarDatosState extends State<_CargarDatos> {
             tema, subtemas, indicedificultad,contenidos);
         parcialesList.add(newparcial);
       }
-
       guardardatos("parciales");
       return parcialesList;
     }else{
       _datosdescargados = true;
-      startprogressindicator(_datosdescargados);
     }
   }
 
@@ -251,13 +260,13 @@ class _CargarDatosState extends State<_CargarDatos> {
   Future guardardatos(String parcialtema) async{
     if(parcialtema=="parciales"){
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      // print("se guardan datos");
+      print("se guardan datos de parciales");
       String temasJson = jsonEncode(parcialesList);
       await prefs.setString('parcial_list', temasJson); // Guardamos en shared preferecnes
       await prefs.setBool('datos_descargados_parciales', true);
     }else{
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      // print("se guardan datos");
+      print("se guardan datos en temas");
       String temasJson = jsonEncode(temasList); //convertios a Json para guardar
       await prefs.setString('temas_list', temasJson); // Guardamos en shared preferecnes
       await prefs.setBool('datos_descargados_listatemas', true);
